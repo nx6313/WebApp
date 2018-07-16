@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,7 +10,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingTop="40dp"
-        android:paddingBottom="20dp"
+        android:paddingBottom="30dp"
         android:background="#007FC8"
         android:orientation="vertical">
 
@@ -21,7 +22,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="35dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -151,6 +152,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="-16dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:background="@drawable/inform_bg"
             android:padding="6dp"
             android:orientation="vertical">
@@ -158,12 +161,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="6dp"
                     android:src="@drawable/icon_crm"/>
@@ -173,27 +179,37 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:text="CRM通知"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textColor="#9c9c9c"
                     android:text="18/02/23"/>
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.4dp"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:background="#43ededed"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="6dp"
                     android:src="@drawable/icon_todo"/>
@@ -203,14 +219,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:text="待处理的审批流程"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textColor="#9c9c9c"
                     android:text="18/02/23"/>
             </LinearLayout>
@@ -232,27 +248,43 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="10sp"
+                android:textSize="13sp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="20dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:text="大昌通知大昌通知大昌通知大昌通知大昌通知"/>
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知"/>
 
             <View
-                android:layout_width="4dp"
-                android:layout_height="4dp"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="8dp"
-                android:background="#303030"/>
+                android:background="@drawable/red_dot"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#35A4F1"
                 android:layout_gravity="center_vertical"
-                android:textSize="10sp"
+                android:textSize="13sp"
                 android:text="更多"/>
         </LinearLayout>
     </LinearLayout>
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srlEnableOverScrollBounce="true"
+        app:srlEnableRefresh="false"
+        app:srlEnableLoadMore="false">
+
+        <include layout="@layout/fragment_console_apps"/>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </LinearLayout>

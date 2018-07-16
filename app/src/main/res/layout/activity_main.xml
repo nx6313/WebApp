@@ -39,8 +39,8 @@
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginTop="2dp"
                 android:src="@drawable/menu_1_normal"/>
 
@@ -49,6 +49,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
+                android:textColor="#404040"
                 android:text="工作台"/>
         </LinearLayout>
 
@@ -65,8 +66,8 @@
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginTop="2dp"
                 android:src="@drawable/menu_2_normal"/>
 
@@ -75,6 +76,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
+                android:textColor="#404040"
                 android:text="业绩看板"/>
         </LinearLayout>
 
@@ -91,8 +93,8 @@
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginTop="2dp"
                 android:src="@drawable/menu_3_normal"/>
 
@@ -101,6 +103,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
+                android:textColor="#404040"
                 android:text="龙虎榜"/>
         </LinearLayout>
 
@@ -117,8 +120,8 @@
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginTop="2dp"
                 android:src="@drawable/menu_4_normal"/>
 
@@ -127,6 +130,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
+                android:textColor="#404040"
                 android:text="客户"/>
         </LinearLayout>
 
@@ -143,8 +147,8 @@
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginTop="2dp"
                 android:src="@drawable/menu_5_normal"/>
 
@@ -153,6 +157,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp"
+                android:textColor="#404040"
                 android:text="我的"/>
         </LinearLayout>
     </LinearLayout>

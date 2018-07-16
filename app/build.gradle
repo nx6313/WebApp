@@ -33,4 +33,5 @@ dependencies {
     compile 'com.just.agentweb:agentweb:4.0.2'
     compile 'com.just.agentweb:download:4.0.2'
     compile 'com.just.agentweb:filechooser:4.0.2'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-12'
 }
