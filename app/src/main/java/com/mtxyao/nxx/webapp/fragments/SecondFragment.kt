@@ -13,6 +13,6 @@ class SecondFragment : BaseFragment() {
     }
 
     override fun setPageUrl(): String {
-        return "https://www.9988bi.com"
+        return ""
     }
 }
