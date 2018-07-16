@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
 
-class IndexFragment : BaseFragment() {
+class WinnersFragment : BaseFragment(true) {
 
     override fun getFragmentView(inflater: LayoutInflater, container: ViewGroup?): View {
-        return inflater.inflate(R.layout.fragment_index, container, false)
+        return inflater.inflate(R.layout.fragment_winners, container, false)
     }
 
     override fun setPageUrl(): String {
-        return "https://www.baidu.com"
+        return ""
     }
 }

@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
 
-class SecondFragment : BaseFragment() {
+class MeFragment : BaseFragment(true) {
 
     override fun getFragmentView(inflater: LayoutInflater, container: ViewGroup?): View {
-        return inflater.inflate(R.layout.fragment_second, container, false)
+        return inflater.inflate(R.layout.fragment_me, container, false)
     }
 
     override fun setPageUrl(): String {

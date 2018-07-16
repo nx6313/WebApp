@@ -9,6 +9,13 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F5F5F5"
+        android:layout_above="@+id/footerMenu"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.4dp"
+        android:background="#43e9e9e9"
         android:layout_above="@+id/footerMenu"/>
 
     <LinearLayout
@@ -16,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#ffcccc"
+        android:background="#ffffff"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -28,18 +35,21 @@
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
-            android:tag="menu-index"
+            android:tag="menu-console"
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_launcher"/>
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/menu_1_normal"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="首页"/>
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:text="工作台"/>
         </LinearLayout>
 
         <LinearLayout
@@ -51,18 +61,99 @@
             android:orientation="vertical"
             android:clickable="true"
             android:focusable="true"
-            android:tag="menu-ss"
+            android:tag="menu-board"
             android:onClick="toMenu">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@mipmap/ic_launcher"/>
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/menu_2_normal"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="第二页"/>
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:text="业绩看板"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:tag="menu-winners"
+            android:onClick="toMenu">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/menu_3_normal"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:text="龙虎榜"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:tag="menu-client"
+            android:onClick="toMenu">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/menu_4_normal"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:text="客户"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:tag="menu-me"
+            android:onClick="toMenu">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/menu_5_normal"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"
+                android:text="我的"/>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
