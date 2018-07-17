@@ -24,7 +24,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
@@ -34,4 +34,8 @@ dependencies {
     compile 'com.just.agentweb:download:4.0.2'
     compile 'com.just.agentweb:filechooser:4.0.2'
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-12'
+    compile 'com.lzy.net:okgo:3.0.4'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
+    compile 'com.youth.banner:banner:1.4.10'
+    compile 'com.google.code.gson:gson:2.8.2'
 }

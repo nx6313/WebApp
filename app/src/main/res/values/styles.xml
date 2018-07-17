@@ -10,4 +10,10 @@
 
     <style name="TranslucentTheme" parent="AppTheme"/>
 
+    <style name="AppTheme.AppLauncher" parent="TranslucentTheme">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>
