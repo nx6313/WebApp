@@ -13,6 +13,6 @@ class WinnersFragment : BaseFragment(true) {
     }
 
     override fun setPageUrl(): String {
-        return ""
+        return "http://m.dachangjr.com"
     }
 }
