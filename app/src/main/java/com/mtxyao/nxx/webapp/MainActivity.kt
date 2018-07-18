@@ -19,10 +19,10 @@ import com.mtxyao.nxx.webapp.fragments.MeFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : FragmentActivity() {
-    var curFragmentPageIndex: Int = 0
-    var fragmentPair: List<Pair<String, Fragment>> ? = null
-    var mPagerAdapter: MyFragmentPagerAdapter ? = null
-    var exitTime: Long = 0
+    private var curFragmentPageIndex: Int = 0
+    private var fragmentPair: List<Pair<String, Fragment>> ? = null
+    private var mPagerAdapter: MyFragmentPagerAdapter ? = null
+    private var exitTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +84,7 @@ class MainActivity : FragmentActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         when(keyCode) {
             KeyEvent.KEYCODE_BACK, KeyEvent.ACTION_DOWN -> {
-                if ((fragmentPair!!.get(curFragmentPageIndex).second as BaseFragment).mAgentWeb!!.handleKeyEvent(keyCode, event)) {
+                if ((fragmentPair!![curFragmentPageIndex].second as BaseFragment).mAgentWeb != null && (fragmentPair!![curFragmentPageIndex].second as BaseFragment).mAgentWeb!!.handleKeyEvent(keyCode, event)) {
                     return true
                 } else {
                     if (System.currentTimeMillis() - exitTime > 2000) {

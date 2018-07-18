@@ -85,7 +85,7 @@ object ComFun {
      */
     fun installApk (context: Context, file: File) {
         val intent = Intent(Intent.ACTION_VIEW)
-        var data: Uri ? = null
+        var data: Uri?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             data = FileProvider.getUriForFile(context, "com.fy.niu.fyreorder.fileprovider", file)
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
