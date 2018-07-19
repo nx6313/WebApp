@@ -16,6 +16,7 @@ import com.mtxyao.nxx.webapp.fragments.BoardFragment
 import com.mtxyao.nxx.webapp.fragments.WinnersFragment
 import com.mtxyao.nxx.webapp.fragments.ClientFragment
 import com.mtxyao.nxx.webapp.fragments.MeFragment
+import com.mtxyao.nxx.webapp.util.ComFun
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : FragmentActivity() {
@@ -88,7 +89,7 @@ class MainActivity : FragmentActivity() {
                     return true
                 } else {
                     if (System.currentTimeMillis() - exitTime > 2000) {
-                        Toast.makeText(this, "再按一次离开", Toast.LENGTH_SHORT).show()
+                        ComFun.showToast(this, "再按一次离开", Toast.LENGTH_SHORT)
                         exitTime = System.currentTimeMillis()
                     } else {
                         System.exit(0)

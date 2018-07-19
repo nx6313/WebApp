@@ -10,13 +10,13 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.just.agentweb.*
 
 abstract class BaseFragment(webView: Boolean) : Fragment() {
     var initWebView: Boolean = false
     var mAgentWeb: AgentWeb? = null
-    var webViewClient : WebViewClient = MWebViewClient()
-    var webChromeClient : WebChromeClient = MWebChromeClient()
+    var titleWrap: View ? = null
 
     init {
         initWebView = webView
@@ -25,13 +25,14 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = getFragmentView(inflater, container)
         if (initWebView) {
+            titleWrap = view.findViewById(R.id.pageTitleWrap)
             val webViewGroup: ViewGroup = view.findViewById(R.id.webAppMain)
             mAgentWeb = AgentWeb.with(this)
                     .setAgentWebParent(webViewGroup, LinearLayout.LayoutParams(-1, -1))
                     .useDefaultIndicator()
                     .setAgentWebWebSettings(AbsAgentWebSettings.getInstance())
-                    .setWebChromeClient(webChromeClient)
-                    .setWebViewClient(webViewClient)
+                    .setWebChromeClient(MWebChromeClient(titleWrap!!))
+                    .setWebViewClient(MWebViewClient(titleWrap!!))
                     .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
                     .setAgentWebUIController(AgentWebUIControllerImplBase())
                     .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.DISALLOW)
@@ -76,14 +77,37 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
         return ""
     }
 
-    class MWebViewClient : WebViewClient() {
+    class MWebViewClient(titleWrap: View?) : WebViewClient() {
+        var tWrap: View ? = null
+
+        init {
+            tWrap = titleWrap
+        }
+
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
         }
+
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            val title = view!!.title
+            tWrap!!.findViewById<TextView>(R.id.pageTitle).text = title
+        }
     }
-    class MWebChromeClient : WebChromeClient() {
+    class MWebChromeClient(titleWrap: View?) : WebChromeClient() {
+        var tWrap: View ? = null
+
+        init {
+            tWrap = titleWrap
+        }
+
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
             super.onProgressChanged(view, newProgress)
+        }
+
+        override fun onReceivedTitle(view: WebView?, title: String?) {
+            super.onReceivedTitle(view, title)
+            tWrap!!.findViewById<TextView>(R.id.pageTitle).text = title
         }
     }
 
