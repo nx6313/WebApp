@@ -24,8 +24,9 @@ class BannerActivity : AppCompatActivity() {
         banner.setImageLoader(GlideImageLoader())
         banner.setImages(images)
         banner.setBannerStyle(BannerConfig.NOT_INDICATOR)
-        banner.setBannerAnimation(Transformer.Tablet)
+        banner.setBannerAnimation(Transformer.DepthPage)
         banner.isAutoPlay(false)
+        banner.setOffscreenPageLimit(images.size)
         banner.start()
         banner.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {

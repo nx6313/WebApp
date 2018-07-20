@@ -2,7 +2,8 @@ package com.mtxyao.nxx.webapp.util
 
 import android.content.Context
 import com.google.gson.Gson
-import java.lang.reflect.Type
+import com.mtxyao.nxx.webapp.entity.UserData
+import org.json.JSONObject
 
 object UserDataUtil {
     enum class SharedNames(val value: String) {
@@ -13,24 +14,30 @@ object UserDataUtil {
         USER_DATA("user_data")
     }
 
-    fun setUserId (context: Context, userId: String) {
+    fun setUserId (context: Context, userId: Int) {
         SharedPreferencesTool.addOrUpdate(context, SharedNames.LOGIN_USER_INFO.value, Key.USER_ID.value, userId)
     }
 
-    fun getUserId (context: Context) : String {
-        return SharedPreferencesTool.getFromShared(context, SharedNames.LOGIN_USER_INFO.value, Key.USER_ID.value, "")
+    fun getUserId (context: Context) : Int {
+        return SharedPreferencesTool.getFromShared(context, SharedNames.LOGIN_USER_INFO.value, Key.USER_ID.value, -1)
     }
 
-    fun <T> setUserData (context: Context, userData: T) {
+    fun setUserData (context: Context, userData: UserData) {
         val dataStr: String = Gson().toJson(userData)
         SharedPreferencesTool.addOrUpdate(context, SharedNames.LOGIN_USER_INFO.value, Key.USER_DATA.value, dataStr)
     }
 
-    fun <T> getUserData (context: Context, classType: Type) : T? {
-        var userData: T ? = null
+    fun getUserData (context: Context) : UserData? {
+        var userData: UserData ? = null
         val userDataStr: String = SharedPreferencesTool.getFromShared(context, SharedNames.LOGIN_USER_INFO.value, Key.USER_DATA.value, "")
         if (userDataStr != "") {
-            userData = Gson().fromJson(userDataStr, classType)
+            val userDataJson = JSONObject(userDataStr)
+            userData = UserData(
+                    userDataJson.getLong("basedate"),
+                    userDataJson.getLong("loginDate"),
+                    userDataJson.getBoolean("needLogin"),
+                    Gson().fromJson(userDataJson.getJSONObject("userInfo").toString(), UserData.UserInfo::class.java)
+            )
         }
         return userData
     }

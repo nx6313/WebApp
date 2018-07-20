@@ -13,18 +13,22 @@ class WelcomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
 
-        val userData: UserData ? = UserDataUtil.getUserData(this, UserData::class.java)
+        val userData: UserData ? = UserDataUtil.getUserData(this)
         Handler().postDelayed({
             if (userData == null) {
                 val bannerIntent = Intent(this, BannerActivity::class.java)
                 startActivity(bannerIntent)
                 finish()
             } else {
-                if (userData?.needLogin!!) {
+                if (userData?.needLogin!! || userData.loginDate!! - System.currentTimeMillis() > 10 * 24 * 60 * 60 * 1000) {
                     val loginIntent = Intent(this, LoginActivity::class.java)
                     startActivity(loginIntent)
                     finish()
-                } else {}
+                } else {
+                    val mainIntent = Intent(this, MainActivity::class.java)
+                    startActivity(mainIntent)
+                    finish()
+                }
             }
         }, 1200)
     }

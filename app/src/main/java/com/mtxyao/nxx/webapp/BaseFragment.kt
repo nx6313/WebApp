@@ -12,6 +12,9 @@ import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.just.agentweb.*
+import com.mtxyao.nxx.webapp.util.AndroidInterfaceForJS
+import com.mtxyao.nxx.webapp.util.ComFun
+import com.mtxyao.nxx.webapp.util.PageOpt
 
 abstract class BaseFragment(webView: Boolean) : Fragment() {
     var initWebView: Boolean = false
@@ -26,6 +29,11 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
         val view: View = getFragmentView(inflater, container)
         if (initWebView) {
             titleWrap = view.findViewById(R.id.pageTitleWrap)
+            titleWrap!!.setPadding(0, ComFun.getStateBarHeight(), 0, 0)
+            val pageOpt = getPageOpt()
+            if (!pageOpt.showTitleBar) {
+                titleWrap!!.visibility = View.GONE
+            }
             val webViewGroup: ViewGroup = view.findViewById(R.id.webAppMain)
             mAgentWeb = AgentWeb.with(this)
                     .setAgentWebParent(webViewGroup, LinearLayout.LayoutParams(-1, -1))
@@ -39,8 +47,11 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                     .interceptUnkownUrl()
                     .createAgentWeb()
                     .ready()
-                    .go(setPageUrl())
+                    .go(setPageUrl() + "?deviceType=android")
+            mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJS())
             mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
+            mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true
+            callByAndroid("callByAndroid")
         }
         return view
     }
@@ -73,6 +84,9 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
     }
 
     abstract fun getFragmentView(inflater: LayoutInflater, container: ViewGroup?): View
+    open fun getPageOpt(): PageOpt {
+        return PageOpt()
+    }
     open fun setPageUrl(): String {
         return ""
     }

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C2259"
+    android:background="@drawable/banner_bg"
     tools:context=".BannerActivity">
 
     <com.youth.banner.Banner

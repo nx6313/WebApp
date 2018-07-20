@@ -1,13 +1,38 @@
 package com.mtxyao.nxx.webapp.entity
 
-class UserData(type: Int, phone: String, login: Boolean) {
-    var cate: Int ? = null // 用户类型
-    var tel: String ? = null // 用户手机号
+class UserData(login: Long, base: Long, need: Boolean, user: UserInfo) {
+    var loginDate: Long ? = null // 用户登录时间
+    var basedate: Long ? = null // 用户数据基础日期
     var needLogin: Boolean ? = null // 每次程序启动到欢迎页面时，判断是否需要登录
+    open var userInfo: UserInfo ? = null // 用户信息
 
     init {
-        cate = type
-        tel = phone
-        needLogin = login
+        loginDate = login
+        basedate = base
+        needLogin = need
+        userInfo = user
+    }
+
+    class UserInfo {
+        var args: Any ? = null
+        var children: Array<Any> ? = null
+        var companyId: Int ? = null
+        var companyName: String ? = null
+        var createBy: Int ? = null
+        var createDate: Long ? = null
+        var delFlag: String ? = null
+        var duty: String ? = null
+        var dutyName: String ? = null
+        var grade: String ? = null
+        var id: Int ? = null
+        var name: String ? = null
+        var parentId: Int ? = null
+        var password: String ? = null
+        var phone: String ? = null
+        var photo: String ? = null
+        var remarks: String ? = null
+        var scope: String ? = null
+        var updateBy: Int ? = null
+        var updateDate: Long ? = null
     }
 }

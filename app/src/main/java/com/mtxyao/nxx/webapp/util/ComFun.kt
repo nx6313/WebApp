@@ -1,5 +1,7 @@
 package com.mtxyao.nxx.webapp.util
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -10,10 +12,13 @@ import android.support.v4.content.FileProvider
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import com.mtxyao.nxx.webapp.R
 import java.io.File
 
 object ComFun {
@@ -43,6 +48,45 @@ object ComFun {
     }
 
     /**
+     * 获取状态栏高度
+     */
+    fun getStateBarHeight (): Int {
+        var stateBarHeight = 0
+        val resourceId = MyApplication.instance!!.resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) {
+            stateBarHeight = MyApplication.instance!!.resources.getDimensionPixelSize(resourceId)
+        }
+        return stateBarHeight
+    }
+
+    private var loadingDialog: AlertDialog ? = null
+    /**
+     * 显示loading弹窗
+     */
+    fun showLoading (activity: Activity, loadingTipValue: String, cancelable: Boolean?) {
+        loadingDialog = AlertDialog.Builder(activity, R.style.MyDialogStyle).setCancelable(cancelable!!).create()
+        loadingDialog!!.show()
+        val params: WindowManager.LayoutParams = loadingDialog!!.window.attributes
+        params.width = getScreenWidth() * 3 / 4
+        loadingDialog!!.window.attributes = params
+
+        val win: Window = loadingDialog!!.window
+        val loadingView: View = activity.layoutInflater.inflate(R.layout.loading_dialog, null)
+        win.setContentView(loadingView)
+        val loadingTip: TextView = loadingView.findViewById(R.id.loadingTip)
+        loadingTip.text = loadingTipValue
+    }
+
+    /**
+     * 隐藏loading弹窗
+     */
+    fun hideLoading () {
+        if (loadingDialog!!.isShowing) {
+            loadingDialog!!.dismiss()
+        }
+    }
+
+    /**
      * 打开输入法
      */
     fun openIME (context: Context, editText: EditText) {
@@ -54,10 +98,10 @@ object ComFun {
      * 关闭输入法
      */
     fun closeIME (context: Context, view: View) {
-        if (view?.windowToken != null) {
+        if (view.windowToken != null) {
             val inputMethodManager: InputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             if (inputMethodManager.isActive) {
-                inputMethodManager.hideSoftInputFromInputMethod(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                inputMethodManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             }
         }
     }
@@ -65,8 +109,8 @@ object ComFun {
     /**
      * 获取屏幕宽度
      */
-    fun getScreenWidth (context: Context) : Int {
-        val wm: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    fun getScreenWidth () : Int {
+        val wm: WindowManager = MyApplication.instance!!.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val outMetrics = DisplayMetrics()
         wm.defaultDisplay.getMetrics(outMetrics)
         return outMetrics.widthPixels
@@ -75,9 +119,9 @@ object ComFun {
     /**
      * 获取程序版本信息
      */
-    fun getVersionInfo (context: Context) : PackageInfo {
-        val packageManager: PackageManager = context.packageManager
-        return packageManager.getPackageInfo(context.packageName, 0)
+    fun getVersionInfo () : PackageInfo {
+        val packageManager: PackageManager = MyApplication.instance!!.packageManager
+        return packageManager.getPackageInfo(MyApplication.instance!!.packageName, 0)
     }
 
     /**
