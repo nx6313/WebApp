@@ -13,6 +13,6 @@ class MeFragment : BaseFragment(true) {
     }
 
     override fun setPageUrl(): String {
-        return "http://172.18.168.67:8080/#/me"
+        return "http://172.18.168.67:8080/#/app-me"
     }
 }

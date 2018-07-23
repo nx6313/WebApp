@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -43,6 +44,7 @@ class MainActivity : FragmentActivity() {
         viewPager.currentItem = curFragmentPageIndex
         viewPager.noScroll = true
         viewPager.noCutAnimation = true
+        viewPager.offscreenPageLimit = 1
     }
 
     fun toMenu (view: View) {

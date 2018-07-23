@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
                                     ComFun.showToast(this@LoginActivity, "登录成功", Toast.LENGTH_SHORT)
                                     val userData = UserData(System.currentTimeMillis(), (data["user"] as JSONObject).getString("createDate").toLong(), false, Gson().fromJson((data["user"] as JSONObject).toString(), UserData.UserInfo::class.java))
                                     UserDataUtil.setUserData(this@LoginActivity, userData)
-                                    UserDataUtil.setUserId(this@LoginActivity, userData.userInfo!!.id!!)
+                                    UserDataUtil.setUserId(this@LoginActivity, userData.user!!.id!!)
 
                                     val mainIntent = Intent(this@LoginActivity, MainActivity::class.java)
                                     startActivity(mainIntent)

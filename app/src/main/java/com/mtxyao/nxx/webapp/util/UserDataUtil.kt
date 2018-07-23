@@ -36,7 +36,7 @@ object UserDataUtil {
                     userDataJson.getLong("basedate"),
                     userDataJson.getLong("loginDate"),
                     userDataJson.getBoolean("needLogin"),
-                    Gson().fromJson(userDataJson.getJSONObject("userInfo").toString(), UserData.UserInfo::class.java)
+                    Gson().fromJson(userDataJson.getJSONObject("user").toString(), UserData.UserInfo::class.java)
             )
         }
         return userData
