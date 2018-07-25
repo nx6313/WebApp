@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
+import com.mtxyao.nxx.webapp.util.PageOpt
 
 class ClientFragment : BaseFragment(true) {
 
@@ -12,7 +13,11 @@ class ClientFragment : BaseFragment(true) {
         return inflater.inflate(R.layout.fragment_client, container, false)
     }
 
+    override fun getPageOpt(): PageOpt {
+        return PageOpt().setShowTitleBar(true)
+    }
+
     override fun setPageUrl(): String {
-        return ""
+        return "http://www.baidu.com"
     }
 }

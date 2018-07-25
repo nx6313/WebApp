@@ -5,6 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
+import com.mtxyao.nxx.webapp.util.PageOpt
+import com.mtxyao.nxx.webapp.util.Urls
 
 class BoardFragment : BaseFragment(true) {
 
@@ -12,7 +14,11 @@ class BoardFragment : BaseFragment(true) {
         return inflater.inflate(R.layout.fragment_board, container, false)
     }
 
+    override fun getPageOpt(): PageOpt {
+        return PageOpt().setShowTitleBar(true)
+    }
+
     override fun setPageUrl(): String {
-        return ""
+        return "${Urls.WEB_BEFORE}#/app-home"
     }
 }

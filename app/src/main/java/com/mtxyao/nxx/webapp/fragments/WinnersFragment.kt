@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
 import com.mtxyao.nxx.webapp.util.PageOpt
+import com.mtxyao.nxx.webapp.util.Urls
 
 class WinnersFragment : BaseFragment(true) {
 
@@ -18,6 +19,6 @@ class WinnersFragment : BaseFragment(true) {
     }
 
     override fun setPageUrl(): String {
-        return "http://m.dachangjr.com"
+        return "${Urls.WEB_BEFORE}#/app-sale-list"
     }
 }

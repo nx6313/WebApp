@@ -38,4 +38,5 @@ dependencies {
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
     compile 'com.youth.banner:banner:1.4.10'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.github.yalantis:ucrop:2.2.2'
 }

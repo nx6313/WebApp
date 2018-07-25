@@ -44,7 +44,7 @@ class MainActivity : FragmentActivity() {
         viewPager.currentItem = curFragmentPageIndex
         viewPager.noScroll = true
         viewPager.noCutAnimation = true
-        viewPager.offscreenPageLimit = 1
+        viewPager.offscreenPageLimit = fragmentPair!!.size
     }
 
     fun toMenu (view: View) {

@@ -33,8 +33,8 @@ object UserDataUtil {
         if (userDataStr != "") {
             val userDataJson = JSONObject(userDataStr)
             userData = UserData(
-                    userDataJson.getLong("basedate"),
                     userDataJson.getLong("loginDate"),
+                    userDataJson.getLong("basedate"),
                     userDataJson.getBoolean("needLogin"),
                     Gson().fromJson(userDataJson.getJSONObject("user").toString(), UserData.UserInfo::class.java)
             )
