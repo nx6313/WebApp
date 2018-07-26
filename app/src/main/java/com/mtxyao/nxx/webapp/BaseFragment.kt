@@ -6,45 +6,43 @@ import android.content.ContentUris
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.support.v4.app.Fragment
-import android.support.v4.content.FileProvider
-import android.util.Log
+import android.support.v4.widget.SwipeRefreshLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
+import com.google.gson.Gson
 import com.just.agentweb.*
+import com.mtxyao.nxx.webapp.entity.UserData
 import com.mtxyao.nxx.webapp.util.AndroidInterfaceForJS
 import com.mtxyao.nxx.webapp.util.ComFun
-import com.mtxyao.nxx.webapp.util.MyApplication
 import com.mtxyao.nxx.webapp.util.PageOpt
+import com.mtxyao.nxx.webapp.util.UserDataUtil
 import com.yalantis.ucrop.UCrop
-import pl.droidsonroids.gif.GifImageView
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
+import java.net.URI
 
 abstract class BaseFragment(webView: Boolean) : Fragment() {
     private var initWebView: Boolean = false
     var mAgentWeb: AgentWeb? = null
     private var titleWrap: View ? = null
     private var statusBar: View ? = null
+    private var pageSwipeRefresh: SwipeRefreshLayout ? = null
     companion object {
         open var PICKER_PIC: Int = 1
         open var PICKER_PHOTO: Int = 2
+        open var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
         open var imageUri: Uri ? = null
     }
 
@@ -69,15 +67,17 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                 statusBar!!.visibility = View.GONE
                 titleWrap!!.visibility = View.GONE
             }
+            pageSwipeRefresh = view.findViewById(R.id.pageSwipeRefresh)
+            if (!pageOpt.canRef) {
+                pageSwipeRefresh!!.isEnabled = false
+            }
             val webViewGroup: ViewGroup = view.findViewById(R.id.webAppMain)
-            val loadingGroup: GifImageView = view.findViewById(R.id.webAppLoading)
-            loadingGroup.visibility = View.GONE
             mAgentWeb = AgentWeb.with(this)
                     .setAgentWebParent(webViewGroup, LinearLayout.LayoutParams(-1, -1))
                     .useDefaultIndicator()
                     .setAgentWebWebSettings(AbsAgentWebSettings.getInstance())
-                    .setWebChromeClient(MWebChromeClient(titleWrap!!, loadingGroup, webViewGroup))
-                    .setWebViewClient(MWebViewClient(titleWrap!!, loadingGroup, webViewGroup))
+                    .setWebChromeClient(MWebChromeClient(titleWrap!!, webViewGroup))
+                    .setWebViewClient(MWebViewClient(titleWrap!!, webViewGroup))
                     .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
                     .setAgentWebUIController(AgentWebUIControllerImplBase())
                     .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.DISALLOW)
@@ -119,23 +119,46 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
         super.onDestroy()
     }
 
+    /**
+     * 返回fragment页面view
+     */
     abstract fun getFragmentView(inflater: LayoutInflater, container: ViewGroup?): View
+
+    /**
+     * 获取fragment页面webView相关配置
+     */
     open fun getPageOpt(): PageOpt {
         return PageOpt()
     }
+
+    /**
+     * 设置fragment页面webView地址
+     */
     open fun setPageUrl(): String {
         return ""
     }
+
+    /**
+     * 初始化fragment页面数据
+     */
     open fun initPageData(fragmentView: View) {}
 
-    class MWebViewClient(titleWrap: View?, loadingGroup: GifImageView?, webViewGroup: ViewGroup?) : WebViewClient() {
+    /**
+     * 获取到选取的相册图片或拍照图片
+     */
+    open fun getPickerImage(bitmap: Bitmap?, pickerUri: Uri?) {}
+
+    /**
+     * 获取到裁剪后的图片
+     */
+    open fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?) {}
+
+    class MWebViewClient(titleWrap: View?, webViewGroup: ViewGroup?) : WebViewClient() {
         private var tWrap: View ? = null
-        private var lGroup: GifImageView ? = null
         private var wGroup: ViewGroup ? = null
 
         init {
             tWrap = titleWrap
-            lGroup = loadingGroup
             wGroup = webViewGroup
         }
 
@@ -154,14 +177,12 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
             tWrap!!.findViewById<TextView>(R.id.pageTitle).text = title
         }
     }
-    class MWebChromeClient(titleWrap: View?, loadingGroup: GifImageView?, webViewGroup: ViewGroup?) : WebChromeClient() {
+    class MWebChromeClient(titleWrap: View?, webViewGroup: ViewGroup?) : WebChromeClient() {
         private var tWrap: View ? = null
-        private var lGroup: GifImageView ? = null
         private var wGroup: ViewGroup ? = null
 
         init {
             tWrap = titleWrap
-            lGroup = loadingGroup
             wGroup = webViewGroup
         }
 
@@ -182,13 +203,18 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d("-=-=-=-=--=>> ", "$requestCode - $resultCode - $data")
-        var pickerPath: String ? = null
+        var pickerPath: String ?
+        var bitmap: Bitmap ? = null
         var pickerUri: Uri ? = null
         when (requestCode) {
             PICKER_PHOTO -> {
                 if (resultCode == RESULT_OK) {
                     pickerUri = imageUri
+                    bitmap = BitmapFactory.decodeStream(this.context!!.contentResolver.openInputStream(imageUri))
+                }
+                getPickerImage(bitmap, pickerUri)
+                if (pickerUri !== null) {
+                    cropRawPhoto(pickerUri!!)
                 }
             }
             PICKER_PIC -> {
@@ -198,24 +224,26 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                     } else {
                         handleImageBeforeKitKat(data)
                     }
-                    pickerUri = Uri.fromFile(File(pickerPath))
+                    if (pickerPath != null) {
+                        bitmap = BitmapFactory.decodeFile(pickerPath)
+                        pickerUri = Uri.fromFile(File(pickerPath))
+                    }
+                }
+                getPickerImage(bitmap, pickerUri)
+                if (pickerUri !== null) {
+                    cropRawPhoto(pickerUri!!)
                 }
             }
-        }
-        if (pickerUri !== null) {
-            var destinationUri: Uri?
-            val destinationImage = File(this.context!!.externalCacheDir, "destination_image.jpg")
-            if (destinationImage.exists()) {
-                destinationImage.delete()
+            UCrop.REQUEST_CROP -> {
+                if (resultCode == RESULT_OK) {
+                    val cropOutUri: Uri ? = UCrop.getOutput(data!!)
+                    bitmap = BitmapFactory.decodeStream(this.context!!.contentResolver.openInputStream(cropOutUri))
+                    getCropImage(bitmap, cropOutUri, File(URI(cropOutUri.toString())))
+                }
             }
-            destinationImage.createNewFile()
-            destinationUri = if (Build.VERSION.SDK_INT >= 24) {
-                FileProvider.getUriForFile(this.context!!, MyApplication.instance!!.applicationContext.packageName + ".provider", destinationImage)
-            } else {
-                Uri.fromFile(destinationImage)
+            UCrop.RESULT_ERROR -> {
+                ComFun.showToast(this.context!!, "裁剪失败", Toast.LENGTH_LONG)
             }
-
-            UCrop.of(pickerUri!!, destinationUri).withAspectRatio(1f, 1f).start(this.activity!!)
         }
     }
 
@@ -256,5 +284,27 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
             cursor.close()
         }
         return path
+    }
+
+    private fun cropRawPhoto (uri: Uri) {
+        val options: UCrop.Options = UCrop.Options()
+        options.setToolbarColor(Color.parseColor("#004E96"))
+        options.setToolbarTitle("裁剪图片")
+        options.setStatusBarColor(Color.parseColor("#004E96"))
+        options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
+        options.setCompressionQuality(100)
+        options.setFreeStyleCropEnabled(false)
+        UCrop.of(uri, Uri.fromFile(File(this.context!!.externalCacheDir, "destination_image.jpg")))
+                .withAspectRatio(1f, 1f)
+                .withMaxResultSize(200, 200)
+                .withOptions(options)
+                .start(this.context!!, this)
+    }
+
+    open fun sendWebActivatedEvent () {
+        if (mAgentWeb != null) {
+            val userData: UserData? = UserDataUtil.getUserData(this.context!!)
+            mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", "webActivated", Gson().toJson(userData))
+        }
     }
 }

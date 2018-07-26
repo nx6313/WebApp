@@ -14,7 +14,7 @@ class ClientFragment : BaseFragment(true) {
     }
 
     override fun getPageOpt(): PageOpt {
-        return PageOpt().setShowTitleBar(true)
+        return PageOpt().setShowTitleBar(true).setCanRef(true)
     }
 
     override fun setPageUrl(): String {

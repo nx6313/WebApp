@@ -1,14 +1,16 @@
 package com.mtxyao.nxx.webapp
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -57,6 +59,7 @@ class MainActivity : FragmentActivity() {
         }
         viewPager.currentItem = curFragmentPageIndex
         toggleCurMenuIcon()
+        (fragmentPair!![curFragmentPageIndex].second as BaseFragment).sendWebActivatedEvent()
     }
 
     private fun toggleCurMenuIcon () {
@@ -100,6 +103,20 @@ class MainActivity : FragmentActivity() {
             }
         }
         return true
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            BaseFragment.REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT, null)
+                    intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+                    startActivityForResult(intent, BaseFragment.PICKER_PIC)
+                } else {
+                    ComFun.showToast(this, "您拒绝了选取图片的权限", Toast.LENGTH_SHORT)
+                }
+            }
+        }
     }
 
     private fun hideBottomUIMenu () {

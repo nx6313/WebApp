@@ -1,17 +1,19 @@
 package com.mtxyao.nxx.webapp.util
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.view.View
 import android.webkit.JavascriptInterface
-import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.google.gson.Gson
 import com.just.agentweb.AgentWeb
 import com.mtxyao.nxx.webapp.BaseFragment
@@ -33,10 +35,6 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
                 deliver.post {
                     val pars = JSONObject(params)
                     val title: String = pars["title"] as String
-//                    val showBack: Boolean = pars["back"] as Boolean
-//                    if (showBack) {
-//                        tWrap!!.findViewById<ImageView>(R.id.pageBack).visibility = View.VISIBLE
-//                    }
                     tWrap!!.findViewById<TextView>(R.id.pageTitle).text = title
                 }
             }
@@ -47,9 +45,13 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
             }
             "selectPic" -> {
                 deliver.post {
-                    val intent = Intent(Intent.ACTION_PICK, null)
-                    intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
-                    fragment.startActivityForResult(intent, BaseFragment.PICKER_PIC)
+                    if (ContextCompat.checkSelfPermission(fragment.context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(fragment.activity!!, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), BaseFragment.REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE)
+                    } else {
+                        val intent = Intent(Intent.ACTION_GET_CONTENT, null)
+                        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+                        fragment.startActivityForResult(intent, BaseFragment.PICKER_PIC)
+                    }
                 }
             }
             "selectPhoto" -> {
@@ -59,10 +61,10 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
                         outputImage.delete()
                     }
                     outputImage.createNewFile()
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        BaseFragment.imageUri = FileProvider.getUriForFile(fragment.context!!, MyApplication.instance!!.applicationContext.packageName + ".provider", outputImage)
+                    BaseFragment.imageUri = if (Build.VERSION.SDK_INT >= 24) {
+                        FileProvider.getUriForFile(fragment.context!!, MyApplication.instance!!.applicationContext.packageName + ".provider", outputImage)
                     } else {
-                        BaseFragment.imageUri = Uri.fromFile(outputImage)
+                        Uri.fromFile(outputImage)
                     }
 
                     val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)

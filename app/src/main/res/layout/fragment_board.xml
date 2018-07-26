@@ -39,19 +39,16 @@
             android:text="业绩看板"/>
     </RelativeLayout>
 
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/webAppLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="100dp"
-        android:src="@drawable/wuzi"
-        android:layout_below="@+id/pageTitleWrap"
-        android:layout_centerInParent="true"/>
-
-    <LinearLayout
-        android:id="@+id/webAppMain"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/pageSwipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/pageTitleWrap"
-        android:orientation="vertical"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pageTitleWrap">
+
+        <LinearLayout
+            android:id="@+id/webAppMain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

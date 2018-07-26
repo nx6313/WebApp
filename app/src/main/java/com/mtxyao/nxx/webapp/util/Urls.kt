@@ -15,4 +15,16 @@ object Urls {
      * 登录接口
      */
     const val URL_LOGIN: String = "data/public/login"
+    /**
+     * 根据用户id获取用户信息 - 售前
+     */
+    const val URL_GET_USERINFI_BY_ID_BEFORE: String = "data/senior/consultant/"
+    /**
+     * 根据用户id获取用户信息 - 售后
+     */
+    const val URL_GET_USERINFI_BY_ID_AFTER: String = "after/senior/consultant/"
+    /**
+     * 文件上传接口
+     */
+    const val URL_FILE_UPLOAD: String = "data/public/consultant/upload/"
 }
