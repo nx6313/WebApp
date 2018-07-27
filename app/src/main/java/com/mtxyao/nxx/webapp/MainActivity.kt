@@ -20,12 +20,13 @@ import com.mtxyao.nxx.webapp.fragments.WinnersFragment
 import com.mtxyao.nxx.webapp.fragments.ClientFragment
 import com.mtxyao.nxx.webapp.fragments.MeFragment
 import com.mtxyao.nxx.webapp.util.ComFun
+import com.mtxyao.nxx.webapp.util.MyFragmentPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : FragmentActivity() {
     private var curFragmentPageIndex: Int = 0
     private var fragmentPair: List<Pair<String, Fragment>> ? = null
-    private var mPagerAdapter: MyFragmentPagerAdapter ? = null
+    private var mPagerAdapter: MyFragmentPagerAdapter? = null
     private var exitTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {

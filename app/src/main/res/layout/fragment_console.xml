@@ -43,12 +43,15 @@
                         android:orientation="horizontal">
 
                         <LinearLayout
+                            android:id="@+id/mainTopMenu_1_clientIn"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:padding="4dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="42dp"
@@ -65,12 +68,15 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/mainTopMenu_1_writeFollowUp"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:padding="4dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="42dp"
@@ -87,12 +93,15 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/mainTopMenu_1_newTask"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:padding="4dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="42dp"
@@ -109,12 +118,15 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/mainTopMenu_1_newOrder"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:padding="4dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:clickable="true"
+                            android:focusable="true">
 
                             <ImageView
                                 android:layout_width="42dp"
@@ -287,12 +299,15 @@
             android:visibility="gone">
 
             <LinearLayout
+                android:id="@+id/mainTopMenu_2_clientIn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="4dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="42dp"
@@ -309,12 +324,15 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/mainTopMenu_2_writeFollowUp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="4dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="42dp"
@@ -331,12 +349,15 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/mainTopMenu_2_newTask"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="4dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="42dp"
@@ -353,12 +374,15 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/mainTopMenu_2_newOrder"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="4dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="42dp"

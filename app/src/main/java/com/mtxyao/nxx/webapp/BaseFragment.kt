@@ -63,12 +63,19 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
             statusBar = view.findViewById(R.id.statusBar)
             statusBar!!.layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, ComFun.getStateBarHeight())
             val pageOpt = getPageOpt()
+            if (pageOpt.statusDark) {
+                this.activity!!.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            } else {
+                this.activity!!.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            }
             if (!pageOpt.showTitleBar) {
                 statusBar!!.visibility = View.GONE
                 titleWrap!!.visibility = View.GONE
             }
             pageSwipeRefresh = view.findViewById(R.id.pageSwipeRefresh)
             if (!pageOpt.canRef) {
+                pageSwipeRefresh!!.isEnabled = false
+            } else {
                 pageSwipeRefresh!!.isEnabled = false
             }
             val webViewGroup: ViewGroup = view.findViewById(R.id.webAppMain)

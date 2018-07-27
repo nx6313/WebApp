@@ -1,4 +1,4 @@
-package com.mtxyao.nxx.webapp
+package com.mtxyao.nxx.webapp.util
 
 import android.content.Context
 import android.support.v4.view.ViewPager

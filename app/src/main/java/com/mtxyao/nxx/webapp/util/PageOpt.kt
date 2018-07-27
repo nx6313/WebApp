@@ -9,6 +9,10 @@ class PageOpt {
      * 是否支持下拉刷新
      */
     var canRef: Boolean = false
+    /**
+     * 页面状态栏颜色风格是否为黑色
+     */
+    var statusDark: Boolean = false
 
     fun setShowTitleBar (showTitle: Boolean): PageOpt {
         showTitleBar = showTitle
@@ -17,6 +21,11 @@ class PageOpt {
 
     fun setCanRef (ref: Boolean): PageOpt {
         canRef = ref
+        return this
+    }
+
+    fun setStatusDark (dark: Boolean): PageOpt {
+        statusDark = dark
         return this
     }
 }

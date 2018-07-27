@@ -1,4 +1,4 @@
-package com.mtxyao.nxx.webapp
+package com.mtxyao.nxx.webapp.util
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager

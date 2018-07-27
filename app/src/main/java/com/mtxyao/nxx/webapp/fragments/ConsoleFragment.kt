@@ -1,5 +1,6 @@
 package com.mtxyao.nxx.webapp.fragments
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.util.TypedValue
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.mtxyao.nxx.webapp.BaseFragment
+import com.mtxyao.nxx.webapp.ClientInActivity
 import com.mtxyao.nxx.webapp.R
 import com.mtxyao.nxx.webapp.util.ComFun
 import com.mtxyao.nxx.webapp.util.DisplayUtil
@@ -67,6 +69,31 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
         mainTopMenu_2 = fragmentView.findViewById(R.id.mainTopMenu_2)
         mainTopMenu_2!!.visibility = View.GONE
         mainTopMenu_2!!.setPadding(0, ComFun.getStateBarHeight(), 0, DisplayUtil.dip2px(this.context!!, 10f))
+
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_1_clientIn).setOnClickListener {
+            toDo("clientIn")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_2_clientIn).setOnClickListener {
+            toDo("clientIn")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_1_writeFollowUp).setOnClickListener {
+            toDo("writeFollowUp")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_2_writeFollowUp).setOnClickListener {
+            toDo("writeFollowUp")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_1_newTask).setOnClickListener {
+            toDo("newTask")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_2_newTask).setOnClickListener {
+            toDo("newTask")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_1_newOrder).setOnClickListener {
+            toDo("newOrder")
+        }
+        fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_2_newOrder).setOnClickListener {
+            toDo("newOrder")
+        }
     }
 
     private fun <K, V> initApps (appsWrap: LinearLayout, apps: Map<K, V>) {
@@ -173,6 +200,18 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
             mainTopMenu_2!!.visibility = View.VISIBLE
         } else {
             mainTopMenu_2!!.visibility = View.GONE
+        }
+    }
+
+    private fun toDo (type: String) {
+        when (type) {
+            "clientIn" -> {
+                val clientInIntent = Intent(this.context, ClientInActivity::class.java)
+                startActivity(clientInIntent)
+            }
+            "writeFollowUp" -> {}
+            "newTask" -> {}
+            "newOrder" -> {}
         }
     }
 

@@ -8,14 +8,14 @@
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#35a4ba"/>
+        android:background="#1F6EC8"/>
 
     <RelativeLayout
         android:id="@+id/pageTitleWrap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/statusBar"
-        android:background="#35a4ba">
+        android:background="#1F6EC8">
 
         <ImageView
             android:id="@+id/pageBack"

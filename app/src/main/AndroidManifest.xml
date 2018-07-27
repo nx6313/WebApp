@@ -21,11 +21,11 @@
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
-
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
+
         <activity
             android:name=".WelcomeActivity"
             android:screenOrientation="portrait"
@@ -47,11 +47,15 @@
         <activity
             android:name=".BannerActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TranslucentTheme"/>
+            android:theme="@style/TranslucentTheme" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".ClientInActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TranslucentTheme"/>
     </application>
 
 </manifest>
