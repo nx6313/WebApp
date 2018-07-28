@@ -28,6 +28,7 @@ import com.just.agentweb.AbsAgentWebSettings
 import com.just.agentweb.AgentWeb
 import com.just.agentweb.AgentWebUIControllerImplBase
 import com.just.agentweb.DefaultWebClient
+import com.mtxyao.nxx.webapp.util.AndroidBug5497Workaround
 import com.mtxyao.nxx.webapp.util.AndroidInterfaceForJSActivity
 import com.mtxyao.nxx.webapp.util.ComFun
 import com.mtxyao.nxx.webapp.util.PageOpt
@@ -42,6 +43,8 @@ abstract class BaseWebActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getActivityLayoutId())
+
+        AndroidBug5497Workaround.assistActivity(this, true)
 
         createAfter()
 

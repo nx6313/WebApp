@@ -126,8 +126,9 @@ class MainActivity : FragmentActivity() {
             v.systemUiVisibility = View.GONE
         } else if (Build.VERSION.SDK_INT >= 19) {
             val decorView: View = window.decorView
-            val uiOptions: Int = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;View.SYSTEM_UI_FLAG_FULLSCREEN
-            decorView.systemUiVisibility = uiOptions
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         }
     }
 

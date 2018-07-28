@@ -68,6 +68,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
             } else {
                 this.activity!!.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             }
+
             if (!pageOpt.showTitleBar) {
                 statusBar!!.visibility = View.GONE
                 titleWrap!!.visibility = View.GONE
