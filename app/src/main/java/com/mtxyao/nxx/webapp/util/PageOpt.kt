@@ -13,6 +13,22 @@ class PageOpt {
      * 页面状态栏颜色风格是否为黑色
      */
     var statusDark: Boolean = false
+    /**
+     * 页面中的图片裁剪功能是否可以调整裁剪框大小
+     */
+    var freeStyleCropEnabled: Boolean = false
+    /**
+     * 页面标题栏透明
+     */
+    var titleBarTransparency: Boolean = false
+    /**
+     * 页面标题栏内容高亮
+     */
+    var titleBarHighlight: Boolean = false
+    /**
+     * 页面webView是否全屏
+     */
+    var webViewFull: Boolean = false
 
     fun setShowTitleBar (showTitle: Boolean): PageOpt {
         showTitleBar = showTitle
@@ -26,6 +42,26 @@ class PageOpt {
 
     fun setStatusDark (dark: Boolean): PageOpt {
         statusDark = dark
+        return this
+    }
+
+    fun setFreeStyleCropEnabled (freeStyleCrop: Boolean): PageOpt {
+        freeStyleCropEnabled = freeStyleCrop
+        return this
+    }
+
+    fun setTitleBarTransparency (transparency: Boolean): PageOpt {
+        titleBarTransparency = transparency
+        return this
+    }
+
+    fun setTitleBarHighlight (highlight: Boolean): PageOpt {
+        titleBarHighlight = highlight
+        return this
+    }
+
+    fun setWebViewFull (full: Boolean): PageOpt {
+        webViewFull = full
         return this
     }
 }

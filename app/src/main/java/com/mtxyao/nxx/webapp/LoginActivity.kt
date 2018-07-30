@@ -1,8 +1,8 @@
 package com.mtxyao.nxx.webapp
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import com.google.gson.Gson
@@ -37,9 +37,9 @@ class LoginActivity : AppCompatActivity() {
                         .tag(this).execute(object: StringCallback() {
                             override fun onSuccess(response: Response<String>?) {
                                 val data = JSONObject(response!!.body())
-                                if (data.has("success") && data.getString("success") == "1") {
+                                if (data.has("code") && data.getString("code") == "1") {
                                     ComFun.showToast(this@LoginActivity, "登录成功", Toast.LENGTH_SHORT)
-                                    val userData = UserData(System.currentTimeMillis(), (data["user"] as JSONObject).getString("createDate").toLong(), false, Gson().fromJson((data["user"] as JSONObject).toString(), UserData.UserInfo::class.java))
+                                    val userData = UserData(System.currentTimeMillis(), ((data["obj"] as JSONObject).getString("createDate") + "000").toLong(), false, Gson().fromJson((data["obj"] as JSONObject).toString(), UserData.UserInfo::class.java))
                                     UserDataUtil.setUserData(this@LoginActivity, userData)
                                     UserDataUtil.setUserId(this@LoginActivity, userData.user!!.id!!)
 
@@ -47,7 +47,7 @@ class LoginActivity : AppCompatActivity() {
                                     startActivity(mainIntent)
                                     finish()
                                 } else {
-                                    ComFun.showToast(this@LoginActivity, "登录失败", Toast.LENGTH_SHORT)
+                                    ComFun.showToast(this@LoginActivity, data.getString("message"), Toast.LENGTH_SHORT)
                                 }
                             }
 

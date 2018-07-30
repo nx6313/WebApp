@@ -301,7 +301,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
         options.setStatusBarColor(Color.parseColor("#004E96"))
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
         options.setCompressionQuality(100)
-        options.setFreeStyleCropEnabled(false)
+        options.setFreeStyleCropEnabled(getPageOpt().freeStyleCropEnabled)
         UCrop.of(uri, Uri.fromFile(File(this.context!!.externalCacheDir, "destination_image.jpg")))
                 .withAspectRatio(1f, 1f)
                 .withMaxResultSize(200, 200)

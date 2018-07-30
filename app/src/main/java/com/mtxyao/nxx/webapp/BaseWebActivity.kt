@@ -4,6 +4,7 @@ import android.annotation.TargetApi
 import android.app.Activity
 import android.content.ContentUris
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,16 +15,17 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import com.just.agentweb.AbsAgentWebSettings
 import com.just.agentweb.AgentWeb
 import com.just.agentweb.AgentWebUIControllerImplBase
@@ -32,13 +34,22 @@ import com.mtxyao.nxx.webapp.util.AndroidBug5497Workaround
 import com.mtxyao.nxx.webapp.util.AndroidInterfaceForJSActivity
 import com.mtxyao.nxx.webapp.util.ComFun
 import com.mtxyao.nxx.webapp.util.PageOpt
+import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.activity_client_in.*
 import java.io.File
 import java.net.URI
 
 abstract class BaseWebActivity : AppCompatActivity() {
-    private var mAgentWeb: AgentWeb? = null
+    var mAgentWeb: AgentWeb? = null
+    companion object {
+        open var PICKER_PIC: Int = 1
+        open var PICKER_PHOTO: Int = 2
+        open var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
+        open var REQUEST_CODE_ASK_CALL_PHONE: Int = 4
+        open var imageUri: Uri ? = null
+    }
+    private var webEventName: String ? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +66,24 @@ abstract class BaseWebActivity : AppCompatActivity() {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        }
+        if (pageOpt.titleBarTransparency) {
+            this.findViewById<View>(R.id.statusBar).setBackgroundColor(Color.TRANSPARENT)
+            this.findViewById<RelativeLayout>(R.id.titleBar).setBackgroundColor(Color.TRANSPARENT)
+        }
+        if (pageOpt.titleBarHighlight) {
+            this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back)
+            this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#FFFFFF"))
+        } else {
+            this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back_dark)
+            this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#212121"))
+        }
+        if (pageOpt.webViewFull) {
+            val webWrapLayout = this.findViewById<SmartRefreshLayout>(R.id.smartRefreshLayout)
+            val ls = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+            ls.bottomToBottom = ConstraintSet.PARENT_ID
+            ls.topToBottom = ConstraintSet.PARENT_ID
+            webWrapLayout.layoutParams = ls
         }
 
         this.findViewById<ImageView>(R.id.pageBack).setOnClickListener {
@@ -149,7 +178,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
     /**
      * 获取到裁剪后的图片
      */
-    open fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?) {}
+    open fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?, webEventName: String?) {}
 
     class MWebViewClient(webViewGroup: ViewGroup?) : WebViewClient() {
         private var wGroup: ViewGroup ? = null
@@ -180,6 +209,25 @@ abstract class BaseWebActivity : AppCompatActivity() {
         override fun onReceivedTitle(view: WebView?, title: String?) {
             super.onReceivedTitle(view, title)
         }
+
+        override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+            Log.i("WEB ## console --->>> ", consoleMessage!!.message())
+            return super.onConsoleMessage(consoleMessage)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT, null)
+                    intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+                    startActivityForResult(intent, PICKER_PIC)
+                } else {
+                    ComFun.showToast(this, "您拒绝了选取图片的权限", Toast.LENGTH_SHORT)
+                }
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -188,17 +236,19 @@ abstract class BaseWebActivity : AppCompatActivity() {
         var bitmap: Bitmap ? = null
         var pickerUri: Uri? = null
         when (requestCode) {
-            BaseFragment.PICKER_PHOTO -> {
+            PICKER_PHOTO -> {
+                webEventName = data!!.getStringExtra("webEventName")
                 if (resultCode == Activity.RESULT_OK) {
-                    pickerUri = BaseFragment.imageUri
-                    bitmap = BitmapFactory.decodeStream(this.contentResolver.openInputStream(BaseFragment.imageUri))
+                    pickerUri = imageUri
+                    bitmap = BitmapFactory.decodeStream(this.contentResolver.openInputStream(imageUri))
                 }
                 getPickerImage(bitmap, pickerUri)
                 if (pickerUri !== null) {
                     cropRawPhoto(pickerUri!!)
                 }
             }
-            BaseFragment.PICKER_PIC -> {
+            PICKER_PIC -> {
+                webEventName = data!!.getStringExtra("webEventName")
                 if (resultCode == Activity.RESULT_OK) {
                     pickerPath = if (Build.VERSION.SDK_INT >= 19) {
                         handleImageOnKitKat(data)
@@ -219,7 +269,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                     val cropOutUri: Uri? = UCrop.getOutput(data!!)
                     bitmap = BitmapFactory.decodeStream(this.contentResolver.openInputStream(cropOutUri))
-                    getCropImage(bitmap, cropOutUri, File(URI(cropOutUri.toString())))
+                    getCropImage(bitmap, cropOutUri, File(URI(cropOutUri.toString())), webEventName)
                 }
             }
             UCrop.RESULT_ERROR -> {
@@ -274,7 +324,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
         options.setStatusBarColor(Color.parseColor("#004E96"))
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
         options.setCompressionQuality(100)
-        options.setFreeStyleCropEnabled(false)
+        options.setFreeStyleCropEnabled(getPageOpt().freeStyleCropEnabled)
         UCrop.of(uri, Uri.fromFile(File(this.externalCacheDir, "destination_image.jpg")))
                 .withAspectRatio(1f, 1f)
                 .withMaxResultSize(200, 200)

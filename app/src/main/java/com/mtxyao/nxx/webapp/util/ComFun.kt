@@ -1,5 +1,6 @@
 package com.mtxyao.nxx.webapp.util
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -8,6 +9,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.util.DisplayMetrics
 import android.view.Gravity
@@ -138,5 +142,26 @@ object ComFun {
         }
         intent.setDataAndType(data, "application/vnd.android.package-archive")
         context.startActivity(intent)
+    }
+
+    /**
+     * 获取最近照片缩略图
+     */
+    fun getRecentlyPhotoPath (activity: Activity) : String {
+        var filePath = ""
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+        } else {
+            val searchPath = MediaStore.Files.FileColumns.DATA + " LIKE '%" + "/DCIM/Camera/" + "%' "
+            val uri = MediaStore.Files.getContentUri("external")
+            val cursor = activity.contentResolver.query(uri, arrayOf(MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.SIZE), searchPath, null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC")
+            if (cursor != null && cursor.moveToFirst()) {
+                filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
+            }
+            if (!cursor.isClosed) {
+                cursor.close()
+            }
+        }
+        return filePath
     }
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <HorizontalScrollView
+        android:id="@+id/recentlyPicScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp">
+
+        <LinearLayout
+            android:id="@+id/recentlyPic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/getPicByPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:gravity="center"
+        android:textColor="#036dca"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="相册"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#f4f4f4"/>
+
+    <TextView
+        android:id="@+id/getPicByCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:gravity="center"
+        android:textColor="#036dca"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="拍摄"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#f4f4f4"/>
+
+    <TextView
+        android:id="@+id/getPicCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:gravity="center"
+        android:textColor="#464646"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="取消"/>
+</LinearLayout>

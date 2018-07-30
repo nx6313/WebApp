@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:name=".util.MyApplication"
@@ -55,7 +56,15 @@
         <activity
             android:name=".ClientInActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TranslucentTheme"/>
+            android:theme="@style/TranslucentTheme" />
+        <activity
+            android:name=".ClientFollowActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TranslucentTheme" />
+        <activity
+            android:name=".AppActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TranslucentTheme" />
     </application>
 
 </manifest>

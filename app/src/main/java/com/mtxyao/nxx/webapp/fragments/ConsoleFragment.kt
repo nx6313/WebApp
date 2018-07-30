@@ -4,51 +4,51 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.util.TypedValue
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
-import com.mtxyao.nxx.webapp.BaseFragment
-import com.mtxyao.nxx.webapp.ClientInActivity
-import com.mtxyao.nxx.webapp.R
+import com.lzy.okgo.OkGo
+import com.lzy.okgo.callback.StringCallback
+import com.lzy.okgo.model.Response
+import com.mtxyao.nxx.webapp.*
 import com.mtxyao.nxx.webapp.util.ComFun
 import com.mtxyao.nxx.webapp.util.DisplayUtil
 import com.mtxyao.nxx.webapp.util.ObservableScrollView
+import com.mtxyao.nxx.webapp.util.Urls
+import org.json.JSONObject
 
 class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewListener {
     private var apps = mapOf(
             Pair("擂台争霸", mapOf(
-                    R.drawable.do_yjpm to "业绩排名",
-                    R.drawable.do_jfph to "积分排名",
-                    R.drawable.do_cgjj to "晋级闯关",
-                    R.drawable.do_pyxb to "评优选拔",
-                    R.drawable.do_ambjs to "阿米巴竞赛"
+                    R.drawable.do_yjpm to listOf("业绩排名", "", false),
+                    R.drawable.do_jfph to listOf("积分排名", "", false),
+                    R.drawable.do_cgjj to listOf("闯关晋星", "app-advance", true),
+                    R.drawable.do_pyxb to listOf("评优选拔", "", false),
+                    R.drawable.do_ambjs to listOf("阿米巴竞赛", "", false)
             )),
             Pair("我的钱袋", mapOf(
-                    R.drawable.do_jsjx to "即时绩效",
-                    R.drawable.do_kpi to "KPI考核",
-                    R.drawable.do_yjjl to "佣金奖励"
+                    R.drawable.do_jsjx to listOf("即时绩效", "", false),
+                    R.drawable.do_kpi to listOf("KPI考核", "", false),
+                    R.drawable.do_yjjl to listOf("佣金奖励", "", false)
             )),
             Pair("客户营销", mapOf(
-                    R.drawable.do_qkhx to "潜客画像",
-                    R.drawable.do_ddgl to "订单管理",
-                    R.drawable.do_qkfx to "潜客分析",
-                    R.drawable.do_cjfx to "成交分析",
-                    R.drawable.do_zbfx to "战败分析",
-                    R.drawable.do_kczy to "库存资源"
+                    R.drawable.do_qkhx to listOf("潜客画像", "", false),
+                    R.drawable.do_ddgl to listOf("订单管理", "", false),
+                    R.drawable.do_qkfx to listOf("潜客分析", "", false),
+                    R.drawable.do_cjfx to listOf("成交分析", "", false),
+                    R.drawable.do_zbfx to listOf("战败分析", "", false),
+                    R.drawable.do_kczy to listOf("库存资源", "", false)
             )),
             Pair("对标对比", mapOf(
-                    R.drawable.do_zcdb to "政策对标",
-                    R.drawable.do_dwfx to "多维分析",
-                    R.drawable.do_sjdb to "数据对比"
+                    R.drawable.do_zcdb to listOf("政策对标", "", false),
+                    R.drawable.do_dwfx to listOf("多维分析", "", false),
+                    R.drawable.do_sjdb to listOf("数据对比", "", false)
             )),
             Pair("独立核算", mapOf(
-                    R.drawable.do_mbdc to "目标达成",
-                    R.drawable.do_tdyj to "团队业绩",
-                    R.drawable.do_fyhs to "费用核算",
-                    R.drawable.do_xyzd to "效益最大",
-                    R.drawable.do_sjcb to "时间成本"
+                    R.drawable.do_mbdc to listOf("目标达成", "", false),
+                    R.drawable.do_tdyj to listOf("团队业绩", "", false),
+                    R.drawable.do_fyhs to listOf("费用核算", "", false),
+                    R.drawable.do_xyzd to listOf("效益最大", "", false),
+                    R.drawable.do_sjcb to listOf("时间成本", "", false)
             ))
     )
 
@@ -94,6 +94,20 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
         fragmentView.findViewById<LinearLayout>(R.id.mainTopMenu_2_newOrder).setOnClickListener {
             toDo("newOrder")
         }
+
+        val informMsg = fragmentView.findViewById<TextView>(R.id.informMsg)
+        OkGo.get<String>(Urls.URL_BEFORE + Urls.URL_INFORM_MSG)
+                .tag(this)
+                .params("page", 1)
+                .params("rows", 1)
+                .execute(object: StringCallback() {
+                    override fun onSuccess(response: Response<String>?) {
+                        val data = JSONObject(response!!.body())
+                        if (data.has("code") && data.getString("code") == "1") {
+                            informMsg.text = data.getJSONArray("list").getJSONObject(0).getString("noticeContent")
+                        }
+                    }
+                })
     }
 
     private fun <K, V> initApps (appsWrap: LinearLayout, apps: Map<K, V>) {
@@ -105,7 +119,6 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
             val itemTitleLs = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             itemTitleLs.setMargins(0, DisplayUtil.dip2px(this.context!!, 4f), 0, 0)
             itemTitleTv.layoutParams = itemTitleLs
-            itemTitleLs
             itemTitleTv.text = item.toPair().first.toString()
             itemTitleTv.paint.isFakeBoldText = true
             itemTitleTv.setTextColor(Color.parseColor("#4b4b4b"))
@@ -121,9 +134,11 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
 
             with(appsGridLayout) {
                 var needFillCount: Int = 4 - (item.toPair().second as Map<*, *>).size
-                for ((k, v) in (item.toPair().second as Map<*, *>)) {
-                    val appTitle: String = v as String
-                    val appDrawable: Int = k as Int
+                for ((k, v) in (item.toPair().second as Map<Int, List<Any>>)) {
+                    val appTitle: String = v[0] as String
+                    val webUri: String = v[1] as String
+                    val titleBarHighlight: Boolean = v[2] as Boolean
+                    val appDrawable: Int = k
 
                     val itemAppItemLayout = LinearLayout(this.context)
                     itemAppItemLayout.gravity = Gravity.CENTER
@@ -146,6 +161,13 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     appTxt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                     appTxt.text = appTitle
                     itemAppItemLayout.addView(appTxt)
+                    itemAppItemLayout.setOnClickListener {
+                        val appIntent = Intent(this@ConsoleFragment.context, AppActivity::class.java)
+                        appIntent.putExtra("titleName", appTitle)
+                        appIntent.putExtra("webUri", webUri)
+                        appIntent.putExtra("titleBarHighlight", titleBarHighlight)
+                        this@ConsoleFragment.context!!.startActivity(appIntent)
+                    }
                     appsGridLayout.addView(itemAppItemLayout)
                 }
                 if ((item.toPair().second as Map<*, *>).size < 4) {
@@ -209,7 +231,10 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                 val clientInIntent = Intent(this.context, ClientInActivity::class.java)
                 startActivity(clientInIntent)
             }
-            "writeFollowUp" -> {}
+            "writeFollowUp" -> {
+                val clientFollowIntent = Intent(this.context, ClientFollowActivity::class.java)
+                startActivity(clientFollowIntent)
+            }
             "newTask" -> {}
             "newOrder" -> {}
         }

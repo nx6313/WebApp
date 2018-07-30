@@ -9,12 +9,12 @@ object Urls {
     /**
      * 接口前缀
      */
-//    const val URL_BEFORE: String = "http://172.18.168.222:8080/"
-    const val URL_BEFORE: String = "http://wx.dcsc520.cn/lhp/"
+    const val URL_BEFORE: String = "http://172.18.168.202:8080/"
+//    const val URL_BEFORE: String = "http://wx.dcsc520.cn/lhp/"
     /**
      * 登录接口
      */
-    const val URL_LOGIN: String = "data/public/login"
+    const val URL_LOGIN: String = "user/login"
     /**
      * 根据用户id获取用户信息 - 售前
      */
@@ -26,5 +26,9 @@ object Urls {
     /**
      * 文件上传接口
      */
-    const val URL_FILE_UPLOAD: String = "data/public/consultant/upload/"
+    const val URL_FILE_UPLOAD: String = "fileUpload/headImageUpload"
+    /**
+     * 获取工作台通知消息
+     */
+    const val URL_INFORM_MSG: String = "messageController/findAll"
 }

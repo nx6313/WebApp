@@ -252,6 +252,7 @@
                             android:src="@drawable/icon_inform"/>
 
                         <TextView
+                            android:id="@+id/informMsg"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -266,7 +267,7 @@
                             android:marqueeRepeatLimit="marquee_forever"
                             android:scrollHorizontally="true"
                             android:singleLine="true"
-                            android:text="大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知大昌通知"/>
+                            android:text=""/>
 
                         <View
                             android:layout_width="6dp"
