@@ -19,36 +19,36 @@ import org.json.JSONObject
 class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewListener {
     private var apps = mapOf(
             Pair("擂台争霸", mapOf(
-                    R.drawable.do_yjpm to listOf("业绩排名", "", false),
-                    R.drawable.do_jfph to listOf("积分排名", "", false),
-                    R.drawable.do_cgjj to listOf("闯关晋星", "app-advance", true),
-                    R.drawable.do_pyxb to listOf("评优选拔", "", false),
-                    R.drawable.do_ambjs to listOf("阿米巴竞赛", "", false)
+                    R.drawable.do_yjpm to listOf("业绩排名", "app-sale-list", false, true, "#04B2AC"),
+                    R.drawable.do_jfph to listOf("积分排名", "h5/paihangbang/paihangbang.html", false, true, "#15549E"),
+                    R.drawable.do_cgjj to listOf("闯关晋星", "app-advance", true, true, ""),
+                    R.drawable.do_pyxb to listOf("评优选拔", "app-badge", true, true, ""),
+                    R.drawable.do_ambjs to listOf("阿米巴竞赛", "h5/jingsan/jinsai.html", false, true, "#154E97")
             )),
             Pair("我的钱袋", mapOf(
-                    R.drawable.do_jsjx to listOf("即时绩效", "", false),
-                    R.drawable.do_kpi to listOf("KPI考核", "", false),
-                    R.drawable.do_yjjl to listOf("佣金奖励", "", false)
+                    R.drawable.do_jsjx to listOf("即时绩效", "app-just-now-performance", false, true, "#004E97"),
+                    R.drawable.do_kpi to listOf("KPI考核", "h5/kpi/kpi.html", false, true, "#004E97"),
+                    R.drawable.do_yjjl to listOf("佣金奖励", "h5/yongjinjiangli/yongjinjiangli.html", false, false, "")
             )),
             Pair("客户营销", mapOf(
-                    R.drawable.do_qkhx to listOf("潜客画像", "", false),
-                    R.drawable.do_ddgl to listOf("订单管理", "", false),
-                    R.drawable.do_qkfx to listOf("潜客分析", "", false),
-                    R.drawable.do_cjfx to listOf("成交分析", "", false),
-                    R.drawable.do_zbfx to listOf("战败分析", "", false),
-                    R.drawable.do_kczy to listOf("库存资源", "", false)
+                    R.drawable.do_qkhx to listOf("潜客画像", "", false, false, ""),
+                    R.drawable.do_ddgl to listOf("订单管理", "", false, false, ""),
+                    R.drawable.do_qkfx to listOf("潜客分析", "app-client", false, true, "#1C6EC8"),
+                    R.drawable.do_cjfx to listOf("成交分析", "h5/chengjiaofenxi/chengjiaofenxi.html", false, false, ""),
+                    R.drawable.do_zbfx to listOf("战败分析", "", false, false, ""),
+                    R.drawable.do_kczy to listOf("库存资源", "", false, false, "")
             )),
             Pair("对标对比", mapOf(
-                    R.drawable.do_zcdb to listOf("政策对标", "", false),
-                    R.drawable.do_dwfx to listOf("多维分析", "", false),
-                    R.drawable.do_sjdb to listOf("数据对比", "", false)
+                    R.drawable.do_zcdb to listOf("政策对标", "h5/kaohe/kaohe.html", false, true, "#004E97"),
+                    R.drawable.do_dwfx to listOf("多维分析", "", false, false, ""),
+                    R.drawable.do_sjdb to listOf("数据对比", "", false, false, "")
             )),
             Pair("独立核算", mapOf(
-                    R.drawable.do_mbdc to listOf("目标达成", "", false),
-                    R.drawable.do_tdyj to listOf("团队业绩", "", false),
-                    R.drawable.do_fyhs to listOf("费用核算", "", false),
-                    R.drawable.do_xyzd to listOf("效益最大", "", false),
-                    R.drawable.do_sjcb to listOf("时间成本", "", false)
+                    R.drawable.do_mbdc to listOf("目标达成", "app-goal-get", false, true, "#004E97"),
+                    R.drawable.do_tdyj to listOf("团队业绩", "h5/tuanduiyeji/tuanduiyeji.html", false, false, ""),
+                    R.drawable.do_fyhs to listOf("费用核算", "h5/hesuan/hesuan.html", false, true, "#004E97"),
+                    R.drawable.do_xyzd to listOf("效益最大", "h5/xiaoyi_big/xiaoyi_big.html", false, false, ""),
+                    R.drawable.do_sjcb to listOf("时间成本", "h5/shijianchengben/shijianchenben.html", false, false, "")
             ))
     )
 
@@ -102,9 +102,11 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                 .params("rows", 1)
                 .execute(object: StringCallback() {
                     override fun onSuccess(response: Response<String>?) {
-                        val data = JSONObject(response!!.body())
-                        if (data.has("code") && data.getString("code") == "1") {
-                            informMsg.text = data.getJSONArray("list").getJSONObject(0).getString("noticeContent")
+                        if (response != null) {
+                            val data = JSONObject(response!!.body())
+                            if (data.has("code") && data.getString("code") == "1") {
+                                informMsg.text = data.getJSONArray("list").getJSONObject(0).getString("noticeContent")
+                            }
                         }
                     }
                 })
@@ -137,7 +139,9 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                 for ((k, v) in (item.toPair().second as Map<Int, List<Any>>)) {
                     val appTitle: String = v[0] as String
                     val webUri: String = v[1] as String
-                    val titleBarHighlight: Boolean = v[2] as Boolean
+                    val fullPage: Boolean = v[2] as Boolean
+                    val titleBarHighlight: Boolean = v[3] as Boolean
+                    val titleBarColor: String = v[4] as String
                     val appDrawable: Int = k
 
                     val itemAppItemLayout = LinearLayout(this.context)
@@ -165,7 +169,9 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                         val appIntent = Intent(this@ConsoleFragment.context, AppActivity::class.java)
                         appIntent.putExtra("titleName", appTitle)
                         appIntent.putExtra("webUri", webUri)
+                        appIntent.putExtra("fullPage", fullPage)
                         appIntent.putExtra("titleBarHighlight", titleBarHighlight)
+                        appIntent.putExtra("titleBarColor", titleBarColor)
                         this@ConsoleFragment.context!!.startActivity(appIntent)
                     }
                     appsGridLayout.addView(itemAppItemLayout)

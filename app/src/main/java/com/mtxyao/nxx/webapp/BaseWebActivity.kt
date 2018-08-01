@@ -1,5 +1,6 @@
 package com.mtxyao.nxx.webapp
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.content.ContentUris
@@ -12,6 +13,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.support.constraint.ConstraintLayout
@@ -38,18 +41,21 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.activity_client_in.*
 import java.io.File
+import java.io.Serializable
 import java.net.URI
 
 abstract class BaseWebActivity : AppCompatActivity() {
     var mAgentWeb: AgentWeb? = null
     companion object {
+        open var baseWebHandler: Handler ? = null
         open var PICKER_PIC: Int = 1
         open var PICKER_PHOTO: Int = 2
         open var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
         open var REQUEST_CODE_ASK_CALL_PHONE: Int = 4
         open var imageUri: Uri ? = null
+        open var MSG_SELECT_IMAGE: Int = 5
+        open var webEventName: String ? = null
     }
-    private var webEventName: String ? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,9 +78,11 @@ abstract class BaseWebActivity : AppCompatActivity() {
             this.findViewById<RelativeLayout>(R.id.titleBar).setBackgroundColor(Color.TRANSPARENT)
         }
         if (pageOpt.titleBarHighlight) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back)
             this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#FFFFFF"))
         } else {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back_dark)
             this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#212121"))
         }
@@ -84,6 +92,10 @@ abstract class BaseWebActivity : AppCompatActivity() {
             ls.bottomToBottom = ConstraintSet.PARENT_ID
             ls.topToBottom = ConstraintSet.PARENT_ID
             webWrapLayout.layoutParams = ls
+        }
+        if (pageOpt.titleBarColor != "") {
+            this.findViewById<View>(R.id.statusBar).setBackgroundColor(Color.parseColor(pageOpt.titleBarColor))
+            this.findViewById<RelativeLayout>(R.id.titleBar).setBackgroundColor(Color.parseColor(pageOpt.titleBarColor))
         }
 
         this.findViewById<ImageView>(R.id.pageBack).setOnClickListener {
@@ -116,6 +128,28 @@ abstract class BaseWebActivity : AppCompatActivity() {
         mAgentWeb!!.agentWebSettings.webSettings.setAppCacheEnabled(true) // 设置APP可以缓存
         mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true // 返回上个界面不刷新  允许本地缓存
         // mAgentWeb!!.agentWebSettings.webSettings.allowFileAccess = true // 设置可以访问文件
+
+        baseWebHandler = @SuppressLint("HandlerLeak")
+        object : Handler() {
+            override fun handleMessage(msg: Message?) {
+                super.handleMessage(msg)
+                when (msg!!.what) {
+                    MSG_SELECT_IMAGE -> {
+                        val list: MutableList<Uri> = (msg!!.data.getSerializable("baseWebSerializable") as BaseWebSerializable).list
+                        val bitmaps = mutableListOf<Bitmap>()
+                        val uris = mutableListOf<Uri>()
+                        val files = mutableListOf<File>()
+                        for (u in list) {
+                            bitmaps.add(BitmapFactory.decodeStream(this@BaseWebActivity.contentResolver.openInputStream(u)))
+                            uris.add(u)
+                            files.add(File(URI(u.toString())))
+                        }
+                        webEventName = msg!!.data.getString("webEventName")
+                        getLatelyImage(bitmaps, uris, files, webEventName)
+                    }
+                }
+            }
+        }
     }
 
     override fun onPause() {
@@ -173,12 +207,17 @@ abstract class BaseWebActivity : AppCompatActivity() {
     /**
      * 获取到选取的相册图片或拍照图片
      */
-    open fun getPickerImage(bitmap: Bitmap?, pickerUri: Uri?) {}
+    open fun getPickerImage(bitmap: Bitmap?, pickerUri: Uri?, pickerFile: File?) {}
 
     /**
      * 获取到裁剪后的图片
      */
     open fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?, webEventName: String?) {}
+
+    /**
+     * 获取到选择到的最近的图片
+     */
+    open fun getLatelyImage(bitmaps: MutableList<Bitmap>?, latelyUris: MutableList<Uri>?, latelyFiles: MutableList<File>?, webEventName: String?) {}
 
     class MWebViewClient(webViewGroup: ViewGroup?) : WebViewClient() {
         private var wGroup: ViewGroup ? = null
@@ -237,18 +276,16 @@ abstract class BaseWebActivity : AppCompatActivity() {
         var pickerUri: Uri? = null
         when (requestCode) {
             PICKER_PHOTO -> {
-                webEventName = data!!.getStringExtra("webEventName")
                 if (resultCode == Activity.RESULT_OK) {
                     pickerUri = imageUri
                     bitmap = BitmapFactory.decodeStream(this.contentResolver.openInputStream(imageUri))
                 }
-                getPickerImage(bitmap, pickerUri)
+                getPickerImage(bitmap, pickerUri, File(URI(pickerUri.toString())))
                 if (pickerUri !== null) {
                     cropRawPhoto(pickerUri!!)
                 }
             }
             PICKER_PIC -> {
-                webEventName = data!!.getStringExtra("webEventName")
                 if (resultCode == Activity.RESULT_OK) {
                     pickerPath = if (Build.VERSION.SDK_INT >= 19) {
                         handleImageOnKitKat(data)
@@ -260,7 +297,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                         pickerUri = Uri.fromFile(File(pickerPath))
                     }
                 }
-                getPickerImage(bitmap, pickerUri)
+                getPickerImage(bitmap, pickerUri, File(URI(pickerUri.toString())))
                 if (pickerUri !== null) {
                     cropRawPhoto(pickerUri!!)
                 }
@@ -330,5 +367,9 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 .withMaxResultSize(200, 200)
                 .withOptions(options)
                 .start(this)
+    }
+
+    class BaseWebSerializable(selectUriList: MutableList<Uri>) : Serializable {
+        open var list: MutableList<Uri> = selectUriList
     }
 }

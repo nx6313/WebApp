@@ -1,17 +1,19 @@
 package com.mtxyao.nxx.webapp.util
 
-import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.util.DisplayMetrics
 import android.view.Gravity
@@ -24,6 +26,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.mtxyao.nxx.webapp.R
 import java.io.File
+import java.io.FileOutputStream
 
 object ComFun {
     var mToast : Toast ? = null
@@ -145,23 +148,120 @@ object ComFun {
     }
 
     /**
-     * 获取最近照片缩略图
+     * 返回相册或截屏中最新的几张图片
      */
-    fun getRecentlyPhotoPath (activity: Activity) : String {
-        var filePath = ""
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
-        } else {
-            val searchPath = MediaStore.Files.FileColumns.DATA + " LIKE '%" + "/DCIM/Camera/" + "%' "
-            val uri = MediaStore.Files.getContentUri("external")
-            val cursor = activity.contentResolver.query(uri, arrayOf(MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.SIZE), searchPath, null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC")
-            if (cursor != null && cursor.moveToFirst()) {
-                filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA))
+    fun getRecentlyPhotoPath (activity: Activity, getCount: Int) : MutableList<Pair<Long, String>> {
+        var picList: MutableList<Pair<Long, String>> = mutableListOf()
+        // 拍摄照片的地址
+        val CAMERA_IMAGE_BUCKET_NAME = Environment.getExternalStorageDirectory().toString() + "/DCIM/Camera"
+        // 截屏照片的地址
+        val SCREENSHOTS_IMAGE_BUCKET_NAME = getScreenshotsPath()
+        // 拍摄照片的地址ID
+        val CAMERA_IMAGE_BUCKET_ID = getBucketId(CAMERA_IMAGE_BUCKET_NAME)
+        // 截屏照片的地址ID
+        val SCREENSHOTS_IMAGE_BUCKET_ID = getBucketId(SCREENSHOTS_IMAGE_BUCKET_NAME)
+        // 查询路径和修改时间
+        val projection = arrayOf(MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media.DATE_MODIFIED)
+        val selection = MediaStore.Images.Media.BUCKET_ID + " = ?"
+
+        val selectionArgs = arrayOf(CAMERA_IMAGE_BUCKET_ID)
+        val selectionArgsForScreenshots = arrayOf(SCREENSHOTS_IMAGE_BUCKET_ID)
+
+        var cameraPair: Pair<Long, String>
+        //检查camera文件夹，查询并排序
+        var cursor = activity.contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC")
+        while (cursor.moveToNext()) {
+            if (picList.size == getCount) {
+                break
             }
-            if (!cursor.isClosed) {
-                cursor.close()
-            }
+            cameraPair = Pair(cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)),
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)))
+            picList.add(cameraPair)
         }
-        return filePath
+
+        //检查Screenshots文件夹
+        var screenshotsPair: Pair<Long, String>
+        //查询并排序
+        cursor = activity.contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgsForScreenshots,
+                MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC")
+        while (cursor.moveToNext()) {
+            if (picList.size == getCount) {
+                break
+            }
+            screenshotsPair = Pair(cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)),
+                    cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)))
+            picList.add(screenshotsPair)
+        }
+
+        if (!cursor.isClosed) {
+            cursor.close()
+        }
+        return picList
+    }
+
+    private fun getBucketId(path: String): String {
+        return path.toLowerCase().hashCode().toString()
+    }
+
+    /**
+     * 获取截图路径
+     */
+    private fun getScreenshotsPath(): String {
+        var path = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
+        var file: File? = File(path)
+        if (!file?.exists()!!) {
+            path = Environment.getExternalStorageDirectory().toString() + "/Pictures/Screenshots"
+        }
+        file = null
+        return path
+    }
+
+    /**
+     * 根据路径生成Bitmap资源
+     */
+    fun getBitMapByPath (path: String, context: Context) : Bitmap {
+        val mediaUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val cursor: Cursor = context.contentResolver.query(mediaUri, null,
+                MediaStore.Images.Media.DISPLAY_NAME + "= ?",
+                arrayOf(path.substring(path.lastIndexOf("/") + 1)), null)
+
+        var uri: Uri ? = null
+        if (cursor.moveToFirst()) {
+            uri = ContentUris.withAppendedId(mediaUri, cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media._ID)))
+        }
+        cursor.close()
+        return BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+    }
+
+    /**
+     * Bitmap 转 Uri
+     */
+    fun bitmap2Uri (context: Context, bitmap: Bitmap) : Uri {
+        val file = File("${context.cacheDir}${File.separator}${System.currentTimeMillis()}.jpg")
+        val os = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+        os.close()
+        return Uri.fromFile(file)
+    }
+
+    /**
+     * 获取bitmap资源大小 字节
+     */
+    fun getBitmapSize (bitmap: Bitmap) : Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return bitmap.allocationByteCount
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            return bitmap.byteCount
+        }
+        return bitmap.rowBytes * bitmap.height
     }
 }

@@ -43,9 +43,49 @@ class ClientInActivity : BaseWebActivity() {
                         val data = JSONObject(response!!.body())
                         if (data.has("code") && data.getString("code") == "1") {
                             ComFun.showToast(this@ClientInActivity, "上传成功", Toast.LENGTH_SHORT)
-                            mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", webEventName, Gson().toJson(mapOf(
-                                    "fPath" to data.getJSONArray("obj").getJSONObject(0).getString("url")
-                            )))
+                            val mutableList: MutableList<String> = mutableListOf()
+                            for (i in 0..(data.getJSONArray("obj").length() - 1)) {
+                                mutableList.add((data.getJSONArray("obj")[i] as JSONObject).getString("url"))
+                            }
+                            mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", webEventName, Gson().toJson(mutableList))
+                        } else {
+                            ComFun.showToast(this@ClientInActivity, "上传失败", Toast.LENGTH_LONG)
+                        }
+                    }
+
+                    override fun uploadProgress(progress: Progress?) {
+                        if (uploadDialog == null || (uploadDialog != null && !uploadDialog!!.isShowing)) {
+                            uploadDialog = AlertDialog.Builder(this@ClientInActivity, R.style.MyDialogStyle).setCancelable(false).create()
+                            uploadDialog!!.show()
+                            val win: Window = uploadDialog!!.window
+                            val uploadView: View = this@ClientInActivity.layoutInflater.inflate(R.layout.upload_dialog, null)
+                            win.setContentView(uploadView)
+                            uploadProgressBar = uploadView.findViewById(R.id.progressBar)
+                            uploadProgressBar!!.max = progress!!.totalSize.toInt()
+                        }
+                        uploadProgressBar!!.progress = progress!!.currentSize.toInt()
+                        if (progress!!.currentSize.toInt() == progress!!.totalSize.toInt()) {
+                            uploadDialog!!.dismiss()
+                            uploadDialog = null
+                        }
+                    }
+                })
+    }
+
+    override fun getLatelyImage(bitmaps: MutableList<Bitmap>?, latelyUris: MutableList<Uri>?, latelyFiles: MutableList<File>?, webEventName: String?) {
+        OkGo.post<String>(Urls.URL_BEFORE + Urls.URL_FILE_UPLOAD)
+                .tag(this)
+                .addFileParams("files", latelyFiles)
+                .execute(object: StringCallback() {
+                    override fun onSuccess(response: Response<String>?) {
+                        val data = JSONObject(response!!.body())
+                        if (data.has("code") && data.getString("code") == "1") {
+                            ComFun.showToast(this@ClientInActivity, "上传成功", Toast.LENGTH_SHORT)
+                            val mutableList: MutableList<String> = mutableListOf()
+                            for (i in 0..(data.getJSONArray("obj").length() - 1)) {
+                                mutableList.add((data.getJSONArray("obj")[i] as JSONObject).getString("url"))
+                            }
+                            mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", webEventName, Gson().toJson(mutableList))
                         } else {
                             ComFun.showToast(this@ClientInActivity, "上传失败", Toast.LENGTH_LONG)
                         }

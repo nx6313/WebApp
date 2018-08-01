@@ -72,7 +72,7 @@ class HorizontalProgressbarWithProgress : ProgressBar {
         if (mode == View.MeasureSpec.EXACTLY) {
             result = size
         } else {
-            val textHeight = (mPaint.descent() - mPaint.ascent()) as Int
+            val textHeight = (mPaint.descent() - mPaint.ascent()).toInt()
             result = paddingTop + paddingBottom + Math.max(Math.max(mReachHeight, mUnReachHeight), Math.abs(textHeight))
             if (mode == View.MeasureSpec.AT_MOST) {
                 result = Math.min(result, size)
@@ -89,11 +89,11 @@ class HorizontalProgressbarWithProgress : ProgressBar {
 
         // drawReachBar
         val text = String.format("%.2f", java.lang.Float.valueOf(progress.toFloat())!! / (1024 * 1024)) + "M/" + String.format("%.2f", java.lang.Float.valueOf(max.toFloat())!! / (1024 * 1024)) + "M"
-        val textWidth = mPaint.measureText(text) as Int
+        val textWidth = mPaint.measureText(text)
         val radio = progress * 1.0f / max
         var progressX = radio * mRealWidth
         if (progressX + textWidth > mRealWidth) {
-            progressX = (mRealWidth - textWidth).toFloat()
+            progressX = (mRealWidth - textWidth)
             noNeedUnReach = true
         }
         val endX = progressX - mTextOffset / 2

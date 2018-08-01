@@ -15,13 +15,25 @@ class AppActivity : BaseWebActivity() {
     }
 
     override fun getPageOpt(): PageOpt {
-        return super.getPageOpt().setStatusDark(false)
-                .setTitleBarTransparency(true)
-                .setTitleBarHighlight(intent.getBooleanExtra("titleBarHighlight", false))
-                .setWebViewFull(true)
+        val pageOpt = super.getPageOpt()
+        if (intent.getBooleanExtra("fullPage", false)) {
+            pageOpt.setWebViewFull(true)
+                    .setTitleBarTransparency(true)
+        } else {
+            pageOpt.setTitleBarColor(intent.getStringExtra("titleBarColor"))
+        }
+        if (intent.getBooleanExtra("titleBarHighlight", false)) {
+            pageOpt.setStatusDark(false)
+                    .setTitleBarHighlight(true)
+        }
+        return pageOpt
     }
 
     override fun setPageUrl(): String {
-        return "${Urls.WEB_BEFORE}#/${intent.getStringExtra("webUri")}"
+        return if (intent.getStringExtra("webUri").indexOf(".html") > 0) {
+            "${Urls.WEB_BEFORE}${intent.getStringExtra("webUri")}"
+        } else {
+            "${Urls.WEB_BEFORE}#/${intent.getStringExtra("webUri")}"
+        }
     }
 }

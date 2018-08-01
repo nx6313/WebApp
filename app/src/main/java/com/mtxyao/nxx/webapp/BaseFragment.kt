@@ -53,7 +53,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = getFragmentView(inflater, container)
         if (initWebView) {
-            titleWrap = view.findViewById(R.id.pageTitleWrap)
+            titleWrap = view.findViewById(R.id.titleBar)
             titleWrap!!.findViewById<ImageView>(R.id.pageBack).setOnClickListener {
                 mAgentWeb!!.back()
                 if (!mAgentWeb!!.webCreator.webView.canGoBack()) {

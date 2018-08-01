@@ -9,8 +9,10 @@
         android:id="@+id/recentlyPicScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="2dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp">
 
         <LinearLayout
             android:id="@+id/recentlyPic"

@@ -10,7 +10,7 @@ object Urls {
      * 接口前缀
      */
     const val URL_BEFORE: String = "http://172.18.168.202:8080/"
-//    const val URL_BEFORE: String = "http://wx.dcsc520.cn/lhp/"
+//    const val URL_BEFORE: String = "http://47.104.187.132:8080/appapi/"
     /**
      * 登录接口
      */

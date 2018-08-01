@@ -29,6 +29,10 @@ class PageOpt {
      * 页面webView是否全屏
      */
     var webViewFull: Boolean = false
+    /**
+     * 页面标题栏以及状态栏颜色
+     */
+    var titleBarColor: String = ""
 
     fun setShowTitleBar (showTitle: Boolean): PageOpt {
         showTitleBar = showTitle
@@ -62,6 +66,11 @@ class PageOpt {
 
     fun setWebViewFull (full: Boolean): PageOpt {
         webViewFull = full
+        return this
+    }
+
+    fun setTitleBarColor (color: String): PageOpt {
+        titleBarColor = color
         return this
     }
 }
