@@ -169,7 +169,6 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                             breviaryBitmaps.clear()
                             masterBitmaps.clear()
                             selectIndexList.clear()
-                            ComFun.showLoading(activity, "获取图片中...", false)
                             val contentView = LayoutInflater.from(activity).inflate(R.layout.picture_dialog, null)
                             val window = PopupWindow(contentView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true)
                             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -182,6 +181,7 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                                 activity.window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
                                 activity.window.attributes = lp
                             }
+                            contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.VISIBLE
                             contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.GONE
                             contentView.findViewById<TextView>(R.id.getPicByPhoto).tag = "photo"
                             contentView.findViewById<TextView>(R.id.getPicByPhoto).setOnClickListener {
@@ -261,7 +261,6 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                                 }
                             }
                             window.showAtLocation(activity.findViewById<View>(android.R.id.content), Gravity.BOTTOM, 0, 0)
-                            ComFun.hideLoading()
                             val lp = activity.window.attributes
                             lp.alpha = 0.3f
                             activity.window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
@@ -346,7 +345,7 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                                                 val recentlyImg = ShadeImageView(activity)
                                                 val recentlyLs = RelativeLayout.LayoutParams(DisplayUtil.dip2px(activity, 100f), DisplayUtil.dip2px(activity, 140f))
                                                 recentlyImg.layoutParams = recentlyLs
-                                                recentlyImg.setImageBitmap(imageBitmap)
+                                                recentlyImg.setImageBitmap(imageBitmapMaster)
                                                 recentlyImg.tag = "recentlyImg"
                                                 recentlyItemLayout.addView(recentlyImg)
 
@@ -361,6 +360,7 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
 
                                                 contentView.findViewById<LinearLayout>(R.id.recentlyPic).addView(recentlyItemLayout)
                                             }
+                                            contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
                                         }
                                     }
                                 }

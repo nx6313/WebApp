@@ -5,6 +5,18 @@
     android:background="#ffffff"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/getRecentlyLoading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="14dp"
+        android:gravity="left"
+        android:textColor="#202120"
+        android:textSize="14sp"
+        android:text="获取最近图片中..."/>
+
     <HorizontalScrollView
         android:id="@+id/recentlyPicScrollView"
         android:layout_width="match_parent"
