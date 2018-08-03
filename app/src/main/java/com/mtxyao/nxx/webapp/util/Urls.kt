@@ -4,13 +4,13 @@ object Urls {
     /**
      * web地址前缀
      */
-//    const val WEB_BEFORE: String = "http://172.18.168.67:8080/"
-    const val WEB_BEFORE: String = "http://m.dachangjr.com/"
+    const val WEB_BEFORE: String = "http://172.18.168.67:8080/"
+//    const val WEB_BEFORE: String = "http://m.dachangjr.com/"
     /**
      * 接口前缀
      */
-    const val URL_BEFORE: String = "http://172.18.168.202:8080/"
-//    const val URL_BEFORE: String = "http://47.104.187.132:8080/appapi/"
+//    const val URL_BEFORE: String = "http://172.18.168.202:8080/"
+    const val URL_BEFORE: String = "http://47.104.187.132:8080/appapi/"
     /**
      * 登录接口
      */

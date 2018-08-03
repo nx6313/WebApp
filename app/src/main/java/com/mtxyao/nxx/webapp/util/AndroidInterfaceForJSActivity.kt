@@ -25,7 +25,9 @@ import com.google.gson.Gson
 import com.just.agentweb.AgentWeb
 import com.mtxyao.nxx.webapp.BaseWebActivity
 import com.mtxyao.nxx.webapp.R
+import com.mtxyao.nxx.webapp.SecondActivity
 import com.mtxyao.nxx.webapp.entity.UserData
+import com.squareup.picasso.Picasso
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -43,7 +45,7 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
     @JavascriptInterface
     open fun callAndroid (msg: String, params: String) {
         when (msg) {
-            "saveUserInfoForAndroid" -> {
+            "saveUserInfo" -> {
                 deliver.post {
                     callByAndroid(msg, null, null)
                 }
@@ -345,7 +347,8 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                                                 val recentlyImg = ShadeImageView(activity)
                                                 val recentlyLs = RelativeLayout.LayoutParams(DisplayUtil.dip2px(activity, 100f), DisplayUtil.dip2px(activity, 140f))
                                                 recentlyImg.layoutParams = recentlyLs
-                                                recentlyImg.setImageBitmap(imageBitmapMaster)
+                                                Picasso.with(activity).load(ComFun.bitmap2Uri(activity, imageBitmapMaster)).noFade().centerInside().fit().into(recentlyImg)
+                                                // recentlyImg.setImageBitmap(imageBitmapMaster)
                                                 recentlyImg.tag = "recentlyImg"
                                                 recentlyItemLayout.addView(recentlyImg)
 
@@ -380,13 +383,22 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                     }
                 }
             }
+            "skipPage" -> {
+                val pars = JSONObject(params)
+                val webPath = pars["path"] as String
+                val title = pars["title"] as String
+                val skipIntent = Intent(activity, SecondActivity::class.java)
+                skipIntent.putExtra("webUri", webPath)
+                skipIntent.putExtra("titleName", title)
+                activity.startActivity(skipIntent)
+            }
         }
     }
 
     // 调用web的方法
     private fun callByAndroid (jsFunName: String, event: String?, params: String?) {
         when (jsFunName) {
-            "saveUserInfoForAndroid" -> {
+            "saveUserInfo" -> {
                 val userData: UserData ? = UserDataUtil.getUserData(activity)
                 mAgentWeb!!.jsAccessEntrace.quickCallJs(jsFunName, Gson().toJson(userData))
             }

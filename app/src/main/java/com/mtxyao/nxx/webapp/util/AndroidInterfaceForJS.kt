@@ -18,6 +18,7 @@ import com.google.gson.Gson
 import com.just.agentweb.AgentWeb
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
+import com.mtxyao.nxx.webapp.SecondActivity
 import com.mtxyao.nxx.webapp.entity.UserData
 import org.json.JSONObject
 import java.io.File
@@ -38,7 +39,7 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
                     tWrap!!.findViewById<TextView>(R.id.pageTitle).text = title
                 }
             }
-            "saveUserInfoForAndroid" -> {
+            "saveUserInfo" -> {
                 deliver.post {
                     callByAndroid(msg)
                 }
@@ -72,13 +73,22 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
                     fragment.startActivityForResult(intent, BaseFragment.PICKER_PHOTO)
                 }
             }
+            "skipPage" -> {
+                val pars = JSONObject(params)
+                val webPath = pars["path"] as String
+                val title = pars["title"] as String
+                val skipIntent = Intent(fragment.context, SecondActivity::class.java)
+                skipIntent.putExtra("webUri", webPath)
+                skipIntent.putExtra("titleName", title)
+                fragment.context!!.startActivity(skipIntent)
+            }
         }
     }
 
     // 调用web的方法
     private fun callByAndroid (jsFunName: String) {
         when (jsFunName) {
-            "saveUserInfoForAndroid" -> {
+            "saveUserInfo" -> {
                 val userData: UserData ? = UserDataUtil.getUserData(fragment.context!!)
                 mAgentWeb!!.jsAccessEntrace.quickCallJs(jsFunName, Gson().toJson(userData))
             }
