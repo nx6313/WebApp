@@ -33,6 +33,10 @@ class PageOpt {
      * 页面标题栏以及状态栏颜色
      */
     var titleBarColor: String = ""
+    /**
+     * 页面所需参数
+     */
+    var pageParams: MutableMap<String, Any> ? = null
 
     fun setShowTitleBar (showTitle: Boolean): PageOpt {
         showTitleBar = showTitle
@@ -71,6 +75,11 @@ class PageOpt {
 
     fun setTitleBarColor (color: String): PageOpt {
         titleBarColor = color
+        return this
+    }
+
+    fun setPageParams (params: MutableMap<String, Any>?): PageOpt {
+        pageParams = params
         return this
     }
 }

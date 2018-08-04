@@ -106,6 +106,14 @@ abstract class BaseWebActivity : AppCompatActivity() {
             }
         }
 
+        var pageUri = setPageUrl() + "?deviceType=android"
+        if (pageOpt.pageParams != null) {
+            for ((k, v) in pageOpt.pageParams!!) {
+                pageUri += "&"
+                pageUri += "$k=$v"
+            }
+        }
+
         val webViewGroup: ViewGroup = this.findViewById(R.id.webAppMain)
         mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(webViewGroup, LinearLayout.LayoutParams(-1, -1))
@@ -119,7 +127,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 .interceptUnkownUrl()
                 .createAgentWeb()
                 .ready()
-                .go(setPageUrl() + "?deviceType=android")
+                .go(pageUri)
         mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJSActivity(this, mAgentWeb!!))
         mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
         mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true

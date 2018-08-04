@@ -387,9 +387,18 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                 val pars = JSONObject(params)
                 val webPath = pars["path"] as String
                 val title = pars["title"] as String
+                val titleDos = (pars["titleDos"] as JSONArray).toString()
+                val titleBarColor = pars["titleBarColor"] as String
+                val statusBarStyle = pars["statusBarStyle"] as String
+                val fullPage = pars["fullPage"] as Boolean
+                val pageParams = (pars["pageParams"] as JSONObject).toString()
                 val skipIntent = Intent(activity, SecondActivity::class.java)
                 skipIntent.putExtra("webUri", webPath)
                 skipIntent.putExtra("titleName", title)
+                skipIntent.putExtra("pageOpts", SecondActivity.PageOptsSerializable(titleDos, pageParams))
+                skipIntent.putExtra("titleBarColor", titleBarColor)
+                skipIntent.putExtra("titleBarHighlight", statusBarStyle == "highlight")
+                skipIntent.putExtra("fullPage", fullPage)
                 activity.startActivity(skipIntent)
             }
         }

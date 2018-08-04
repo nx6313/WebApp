@@ -65,7 +65,10 @@
             android:name=".AppActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentTheme" />
-        <activity android:name=".SecondActivity"></activity>
+        <activity
+            android:name=".SecondActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TranslucentTheme" />
     </application>
 
 </manifest>

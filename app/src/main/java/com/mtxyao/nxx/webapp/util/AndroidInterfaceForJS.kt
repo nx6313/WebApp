@@ -20,6 +20,7 @@ import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
 import com.mtxyao.nxx.webapp.SecondActivity
 import com.mtxyao.nxx.webapp.entity.UserData
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
@@ -77,9 +78,18 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
                 val pars = JSONObject(params)
                 val webPath = pars["path"] as String
                 val title = pars["title"] as String
+                val titleDos = (pars["titleDos"] as JSONArray).toString()
+                val titleBarColor = pars["titleBarColor"] as String
+                val statusBarStyle = pars["statusBarStyle"] as String
+                val fullPage = pars["fullPage"] as Boolean
+                val pageParams = (pars["pageParams"] as JSONObject).toString()
                 val skipIntent = Intent(fragment.context, SecondActivity::class.java)
                 skipIntent.putExtra("webUri", webPath)
                 skipIntent.putExtra("titleName", title)
+                skipIntent.putExtra("pageOpts", SecondActivity.PageOptsSerializable(titleDos, pageParams))
+                skipIntent.putExtra("titleBarColor", titleBarColor)
+                skipIntent.putExtra("titleBarHighlight", statusBarStyle == "highlight")
+                skipIntent.putExtra("fullPage", fullPage)
                 fragment.context!!.startActivity(skipIntent)
             }
         }
