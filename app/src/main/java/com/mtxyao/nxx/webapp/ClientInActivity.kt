@@ -31,7 +31,7 @@ class ClientInActivity : BaseWebActivity() {
     }
 
     override fun setPageUrl(): String {
-        return "${Urls.WEB_BEFORE}#/app-client-in"
+        return "app-client-in"
     }
 
     override fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?, webEventName: String?) {

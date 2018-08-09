@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import com.mtxyao.nxx.webapp.BaseFragment
 import com.mtxyao.nxx.webapp.R
 import com.mtxyao.nxx.webapp.util.PageOpt
-import com.mtxyao.nxx.webapp.util.Urls
 
 class ClientFragment : BaseFragment(true) {
 
@@ -19,6 +18,6 @@ class ClientFragment : BaseFragment(true) {
     }
 
     override fun setPageUrl(): String {
-        return "${Urls.WEB_BEFORE}#/app-client"
+        return "app-client"
     }
 }

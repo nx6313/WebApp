@@ -2,13 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="8dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/topAppsWrap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
+        android:layout_marginBottom="12dp"
+        android:background="#ffffff"/>
 
     <LinearLayout
         android:id="@+id/appsWrap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:background="#ffffff"/>
 </LinearLayout>

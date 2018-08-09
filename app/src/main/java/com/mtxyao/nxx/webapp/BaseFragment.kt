@@ -19,16 +19,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.*
 import com.google.gson.Gson
 import com.just.agentweb.*
 import com.mtxyao.nxx.webapp.entity.UserData
-import com.mtxyao.nxx.webapp.util.AndroidInterfaceForJS
-import com.mtxyao.nxx.webapp.util.ComFun
-import com.mtxyao.nxx.webapp.util.PageOpt
-import com.mtxyao.nxx.webapp.util.UserDataUtil
+import com.mtxyao.nxx.webapp.util.*
 import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.net.URI
@@ -80,6 +78,20 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                 pageSwipeRefresh!!.isEnabled = false
             }
             val webViewGroup: ViewGroup = view.findViewById(R.id.webAppMain)
+            var pageUrl = Urls.WEB_BEFORE
+            if (setPageUrl().indexOf(".html") > 0) {
+                pageUrl += "/${setPageUrl()}"
+            } else {
+                if (setPageUrl() != "") {
+                    pageUrl += "#/${setPageUrl()}"
+                } else {
+                    pageUrl += "#/app-no-page"
+                    this.activity!!.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                    statusBar!!.visibility = View.GONE
+                    titleWrap!!.visibility = View.GONE
+                }
+            }
+            pageUrl += "?deviceType=android"
             mAgentWeb = AgentWeb.with(this)
                     .setAgentWebParent(webViewGroup, LinearLayout.LayoutParams(-1, -1))
                     .useDefaultIndicator()
@@ -92,7 +104,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                     .interceptUnkownUrl()
                     .createAgentWeb()
                     .ready()
-                    .go(setPageUrl() + "?deviceType=android")
+                    .go(pageUrl)
             mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJS(this, mAgentWeb!!, titleWrap!!))
             mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
             mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true
@@ -101,6 +113,13 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
             mAgentWeb!!.agentWebSettings.webSettings.setAppCacheEnabled(true) // 设置APP可以缓存
             mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true // 返回上个界面不刷新  允许本地缓存
             // mAgentWeb!!.agentWebSettings.webSettings.allowFileAccess = true // 设置可以访问文件
+            if (Build.VERSION.SDK_INT >= 19) {
+                mAgentWeb!!.agentWebSettings.webSettings.useWideViewPort = true
+                mAgentWeb!!.agentWebSettings.webSettings.loadWithOverviewMode = true
+            } else {
+                mAgentWeb!!.agentWebSettings.webSettings.setSupportZoom(false)
+                mAgentWeb!!.agentWebSettings.webSettings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
+            }
         }
         initPageData(view)
         return view

@@ -24,19 +24,13 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.ConsoleMessage
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.*
 import com.just.agentweb.AbsAgentWebSettings
 import com.just.agentweb.AgentWeb
 import com.just.agentweb.AgentWebUIControllerImplBase
 import com.just.agentweb.DefaultWebClient
-import com.mtxyao.nxx.webapp.util.AndroidBug5497Workaround
-import com.mtxyao.nxx.webapp.util.AndroidInterfaceForJSActivity
-import com.mtxyao.nxx.webapp.util.ComFun
-import com.mtxyao.nxx.webapp.util.PageOpt
+import com.mtxyao.nxx.webapp.util.*
 import com.scwang.smartrefresh.layout.SmartRefreshLayout
 import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.activity_client_in.*
@@ -106,11 +100,31 @@ abstract class BaseWebActivity : AppCompatActivity() {
             }
         }
 
-        var pageUri = setPageUrl() + "?deviceType=android"
+        var pageUrl = Urls.WEB_BEFORE
+        if (setPageUrl().indexOf(".html") > 0) {
+            pageUrl += "/${setPageUrl()}"
+        } else {
+            if (setPageUrl() != "") {
+                pageUrl += "#/${setPageUrl()}"
+            } else {
+                pageUrl += "#/app-no-page"
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                this.findViewById<View>(R.id.statusBar).setBackgroundColor(Color.TRANSPARENT)
+                this.findViewById<RelativeLayout>(R.id.titleBar).setBackgroundColor(Color.TRANSPARENT)
+                this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back)
+                this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#FFFFFF"))
+                val webWrapLayout = this.findViewById<SmartRefreshLayout>(R.id.smartRefreshLayout)
+                val ls = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+                ls.bottomToBottom = ConstraintSet.PARENT_ID
+                ls.topToBottom = ConstraintSet.PARENT_ID
+                webWrapLayout.layoutParams = ls
+            }
+        }
+        pageUrl += "?deviceType=android"
         if (pageOpt.pageParams != null) {
             for ((k, v) in pageOpt.pageParams!!) {
-                pageUri += "&"
-                pageUri += "$k=$v"
+                pageUrl += "&"
+                pageUrl += "$k=$v"
             }
         }
 
@@ -127,7 +141,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 .interceptUnkownUrl()
                 .createAgentWeb()
                 .ready()
-                .go(pageUri)
+                .go(pageUrl)
         mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJSActivity(this, mAgentWeb!!))
         mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
         mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true
@@ -136,6 +150,13 @@ abstract class BaseWebActivity : AppCompatActivity() {
         mAgentWeb!!.agentWebSettings.webSettings.setAppCacheEnabled(true) // 设置APP可以缓存
         mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true // 返回上个界面不刷新  允许本地缓存
         // mAgentWeb!!.agentWebSettings.webSettings.allowFileAccess = true // 设置可以访问文件
+        if (Build.VERSION.SDK_INT >= 19) {
+            mAgentWeb!!.agentWebSettings.webSettings.useWideViewPort = true
+            mAgentWeb!!.agentWebSettings.webSettings.loadWithOverviewMode = true
+        } else {
+            mAgentWeb!!.agentWebSettings.webSettings.setSupportZoom(false)
+            mAgentWeb!!.agentWebSettings.webSettings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
+        }
 
         baseWebHandler = @SuppressLint("HandlerLeak")
         object : Handler() {

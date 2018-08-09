@@ -17,14 +17,14 @@ import com.mtxyao.nxx.webapp.util.Urls
 import org.json.JSONObject
 
 class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewListener {
+    private var topApps = mapOf(
+            R.drawable.do_yjpm to listOf("龙虎榜", "app-winner-list", false, true, "#007EC8"),
+            R.drawable.do_jsjx to listOf("智能分析", "", false, true, "#04B2AC"),
+            R.drawable.do_qkhx to listOf("客户营销", "", false, true, "#04B2AC"),
+            R.drawable.do_dwfx to listOf("对标对比", "", false, true, "#04B2AC"),
+            R.drawable.do_fyhs to listOf("独立核算", "", false, true, "#04B2AC")
+    )
     private var apps = mapOf(
-            Pair("擂台争霸", mapOf(
-                    R.drawable.do_yjpm to listOf("业绩排名", "app-sale-list", false, true, "#04B2AC"),
-                    R.drawable.do_jfph to listOf("积分排名", "h5/paihangbang/paihangbang.html", false, true, "#15549E"),
-                    R.drawable.do_cgjj to listOf("闯关晋星", "app-advance", true, true, ""),
-                    R.drawable.do_pyxb to listOf("评优选拔", "app-badge", true, true, ""),
-                    R.drawable.do_ambjs to listOf("阿米巴竞赛", "h5/jingsan/jinsai.html", false, true, "#154E97")
-            )),
             Pair("我的钱袋", mapOf(
                     R.drawable.do_jsjx to listOf("即时绩效", "app-just-now-performance", false, true, "#004E97"),
                     R.drawable.do_kpi to listOf("KPI考核", "h5/kpi/kpi.html", false, true, "#004E97"),
@@ -61,6 +61,8 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
     }
 
     override fun initPageData(fragmentView: View) {
+        val topAppsWrap = fragmentView.findViewById<LinearLayout>(R.id.topAppsWrap)
+        initTopApps(topAppsWrap, topApps)
         val appsWrap = fragmentView.findViewById<LinearLayout>(R.id.appsWrap)
         initApps(appsWrap, apps)
         scrollView = fragmentView.findViewById(R.id.mainScrollView)
@@ -112,6 +114,46 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                 })
     }
 
+    private fun <K, V> initTopApps (appsWrap: LinearLayout, topApps: Map<K, V>) {
+        for ((icon, data) in (topApps as Map<Int, List<Any>>)) {
+            val appTitle: String = data[0] as String
+            val webUri: String = data[1] as String
+            val fullPage: Boolean = data[2] as Boolean
+            val titleBarHighlight: Boolean = data[3] as Boolean
+            val titleBarColor: String = data[4] as String
+
+            with(appsWrap) {
+                val itemAppItemLayout = LinearLayout(this.context)
+                itemAppItemLayout.gravity = Gravity.CENTER
+                itemAppItemLayout.orientation = LinearLayout.VERTICAL
+                itemAppItemLayout.setPadding(DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f))
+                val itemAppItemLayoutLs = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                itemAppItemLayout.layoutParams = itemAppItemLayoutLs
+                val appImg = ImageView(this.context)
+                appImg.layoutParams = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 50f), DisplayUtil.dip2px(this.context!!, 50f))
+                appImg.setImageResource(icon)
+                itemAppItemLayout.addView(appImg)
+                val appTxt = TextView(this.context)
+                val appTxtLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                appTxtLs.setMargins(0, DisplayUtil.dip2px(this.context!!, 6f), 0, 0)
+                appTxt.layoutParams = appTxtLs
+                appTxt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                appTxt.text = appTitle
+                itemAppItemLayout.addView(appTxt)
+                itemAppItemLayout.setOnClickListener {
+                    val appIntent = Intent(this@ConsoleFragment.context, AppActivity::class.java)
+                    appIntent.putExtra("titleName", appTitle)
+                    appIntent.putExtra("webUri", webUri)
+                    appIntent.putExtra("fullPage", fullPage)
+                    appIntent.putExtra("titleBarHighlight", titleBarHighlight)
+                    appIntent.putExtra("titleBarColor", titleBarColor)
+                    this@ConsoleFragment.context!!.startActivity(appIntent)
+                }
+                addView(itemAppItemLayout)
+            }
+        }
+    }
+
     private fun <K, V> initApps (appsWrap: LinearLayout, apps: Map<K, V>) {
         var itemIndex = 0
         for (item in apps) {
@@ -119,7 +161,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
             itemLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             val itemTitleTv = TextView(this.context)
             val itemTitleLs = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-            itemTitleLs.setMargins(0, DisplayUtil.dip2px(this.context!!, 4f), 0, 0)
+            itemTitleLs.setMargins(DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 4f), 0, 0)
             itemTitleTv.layoutParams = itemTitleLs
             itemTitleTv.text = item.toPair().first.toString()
             itemTitleTv.paint.isFakeBoldText = true
@@ -147,7 +189,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     val itemAppItemLayout = LinearLayout(this.context)
                     itemAppItemLayout.gravity = Gravity.CENTER
                     itemAppItemLayout.orientation = LinearLayout.VERTICAL
-                    itemAppItemLayout.setPadding(DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f),DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f))
+                    itemAppItemLayout.setPadding(0, DisplayUtil.dip2px(this.context!!, 6f), 0, DisplayUtil.dip2px(this.context!!, 6f))
                     val itemAppItemLayoutLs = GridLayout.LayoutParams()
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         itemAppItemLayoutLs.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1.0f)
@@ -155,7 +197,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     }
                     itemAppItemLayout.layoutParams = itemAppItemLayoutLs
                     val appImg = ImageView(this.context)
-                    appImg.layoutParams = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 44f), DisplayUtil.dip2px(this.context!!, 44f))
+                    appImg.layoutParams = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 50f), DisplayUtil.dip2px(this.context!!, 50f))
                     appImg.setImageResource(appDrawable)
                     itemAppItemLayout.addView(appImg)
                     val appTxt = TextView(this.context)
@@ -174,14 +216,14 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                         appIntent.putExtra("titleBarColor", titleBarColor)
                         this@ConsoleFragment.context!!.startActivity(appIntent)
                     }
-                    appsGridLayout.addView(itemAppItemLayout)
+                    addView(itemAppItemLayout)
                 }
                 if ((item.toPair().second as Map<*, *>).size < 4) {
                     while (needFillCount > 0) {
                         val itemAppItemLayout = LinearLayout(this.context)
                         itemAppItemLayout.gravity = Gravity.CENTER
                         itemAppItemLayout.orientation = LinearLayout.VERTICAL
-                        itemAppItemLayout.setPadding(DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f),DisplayUtil.dip2px(this.context!!, 6f), DisplayUtil.dip2px(this.context!!, 6f))
+                        itemAppItemLayout.setPadding(0, DisplayUtil.dip2px(this.context!!, 6f), 0, DisplayUtil.dip2px(this.context!!, 6f))
                         val itemAppItemLayoutLs = GridLayout.LayoutParams()
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             itemAppItemLayoutLs.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1.0f)
@@ -189,7 +231,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                         }
                         itemAppItemLayout.layoutParams = itemAppItemLayoutLs
                         val appImg = ImageView(this.context)
-                        appImg.layoutParams = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 44f), DisplayUtil.dip2px(this.context!!, 44f))
+                        appImg.layoutParams = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 50f), DisplayUtil.dip2px(this.context!!, 50f))
                         itemAppItemLayout.addView(appImg)
                         val appTxt = TextView(this.context)
                         val appTxtLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -197,7 +239,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                         appTxt.layoutParams = appTxtLs
                         appTxt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
                         itemAppItemLayout.addView(appTxt)
-                        appsGridLayout.addView(itemAppItemLayout)
+                        addView(itemAppItemLayout)
                         needFillCount--
                     }
                 }

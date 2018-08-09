@@ -33,7 +33,7 @@ class MeFragment : BaseFragment(true) {
     }
 
     override fun setPageUrl(): String {
-        return "${Urls.WEB_BEFORE}#/app-me"
+        return "app-me"
     }
 
     override fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?) {
