@@ -14,6 +14,7 @@ import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
+import android.util.TypedValue
 import android.view.*
 import android.webkit.JavascriptInterface
 import android.widget.*
@@ -400,6 +401,106 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                 skipIntent.putExtra("titleBarHighlight", statusBarStyle == "highlight")
                 skipIntent.putExtra("fullPage", fullPage)
                 activity.startActivity(skipIntent)
+            }
+            "addTitleBtn" -> {
+                deliver.post {
+                    if (params != "") {
+                        val pars = JSONArray(params)
+                        val titleBtnWrap = activity.findViewById<LinearLayout>(R.id.titleBtnWrap)
+                        if (titleBtnWrap != null) {
+                            titleBtnWrap.visibility = View.VISIBLE
+                            titleBtnWrap.removeAllViews()
+                            for (b in 0..(pars.length() - 1)) {
+                                val btnObj = pars.getJSONObject(b)
+                                val event = btnObj.getString("event")
+                                val txt = btnObj.getString("txt")
+                                with(titleBtnWrap) {
+                                    val titleBtn = Button(activity)
+                                    val ls = LinearLayout.LayoutParams(DisplayUtil.dip2px(activity, 40f), DisplayUtil.dip2px(activity, 26f))
+                                    if (b > 0) {
+                                        ls.setMargins(DisplayUtil.dip2px(activity, -1f), 0, 0, 0)
+                                    }
+                                    titleBtn.layoutParams = ls
+                                    if (this.tag == "highlight") {
+                                        titleBtn.setBackgroundResource(R.drawable.border_line_while_)
+                                        titleBtn.setTextColor(Color.parseColor("#40AAE6"))
+                                        if (b == 0) {
+                                            titleBtn.setBackgroundResource(R.drawable.border_line_while_left)
+                                            titleBtn.setTextColor(Color.parseColor("#ffffff"))
+                                        }
+                                        if (b == pars.length() - 1) {
+                                            titleBtn.setBackgroundResource(R.drawable.border_line_while_right_)
+                                        }
+                                    } else if (this.tag == "dark") {
+                                        titleBtn.setBackgroundResource(R.drawable.border_line_dark_)
+                                        titleBtn.setTextColor(Color.parseColor("#A8A8A8"))
+                                        if (b == 0) {
+                                            titleBtn.setBackgroundResource(R.drawable.border_line_dark_left)
+                                            titleBtn.setTextColor(Color.parseColor("#464646"))
+                                        }
+                                        if (b == pars.length() - 1) {
+                                            titleBtn.setBackgroundResource(R.drawable.border_line_dark_right_)
+                                        }
+                                    }
+                                    titleBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+                                    titleBtn.tag = event
+                                    titleBtn.text = txt
+                                    addView(titleBtn)
+                                    titleBtn.setOnClickListener {
+                                        if ((it.parent as View).tag == "highlight") {
+                                            var index = 0
+                                            for (c in 0..((it.parent as ViewGroup).childCount - 1)) {
+                                                if ((it.parent as ViewGroup).getChildAt(c).tag == it.tag) {
+                                                    index = c
+                                                }
+                                                (it.parent as ViewGroup).getChildAt(c).setBackgroundResource(R.drawable.border_line_while_)
+                                                if (c == 0) {
+                                                    (it.parent as ViewGroup).getChildAt(c).setBackgroundResource(R.drawable.border_line_while_left_)
+                                                }
+                                                if (c == (it.parent as ViewGroup).childCount - 1) {
+                                                    (it.parent as ViewGroup).getChildAt(c).setBackgroundResource(R.drawable.border_line_while_right_)
+                                                }
+                                                ((it.parent as ViewGroup).getChildAt(c) as Button).setTextColor(Color.parseColor("#40AAE6"))
+                                            }
+                                            (it as Button).setBackgroundResource(R.drawable.border_line_while)
+                                            if (index == 0) {
+                                                it.setBackgroundResource(R.drawable.border_line_while_left)
+                                            }
+                                            if (index == (it.parent as ViewGroup).childCount - 1) {
+                                                it.setBackgroundResource(R.drawable.border_line_while_right)
+                                            }
+                                            it.setTextColor(Color.parseColor("#ffffff"))
+                                        } else if ((it.parent as View).tag == "dark") {
+                                            var index = 0
+                                            for (c in 0..((it.parent as ViewGroup).childCount - 1)) {
+                                                if ((it.parent as ViewGroup).getChildAt(c).tag == it.tag) {
+                                                    index = c
+                                                }
+                                                (it.parent as ViewGroup).getChildAt(c).setBackgroundResource(R.drawable.border_line_dark_)
+                                                if (c == 0) {
+                                                    (it.parent as ViewGroup).getChildAt(c).setBackgroundResource(R.drawable.border_line_dark_left_)
+                                                }
+                                                if (c == (it.parent as ViewGroup).childCount - 1) {
+                                                    (it.parent as ViewGroup).getChildAt(c).setBackgroundResource(R.drawable.border_line_dark_right_)
+                                                }
+                                                ((it.parent as ViewGroup).getChildAt(c) as Button).setTextColor(Color.parseColor("#A8A8A8"))
+                                            }
+                                            (it as Button).setBackgroundResource(R.drawable.border_line_dark)
+                                            if (index == 0) {
+                                                it.setBackgroundResource(R.drawable.border_line_dark_left)
+                                            }
+                                            if (index == (it.parent as ViewGroup).childCount - 1) {
+                                                it.setBackgroundResource(R.drawable.border_line_dark_right)
+                                            }
+                                            it.setTextColor(Color.parseColor("#464646"))
+                                        }
+                                        callByAndroid("androidEvent", it.tag.toString(), "")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

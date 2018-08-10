@@ -56,6 +56,16 @@
             android:text="控制台app模块标题"
             android:textColor="#212121"
             android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/titleBtnWrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

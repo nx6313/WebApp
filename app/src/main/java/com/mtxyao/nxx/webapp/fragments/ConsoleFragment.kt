@@ -18,37 +18,27 @@ import org.json.JSONObject
 
 class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewListener {
     private var topApps = mapOf(
-            R.drawable.do_yjpm to listOf("龙虎榜", "app-winner-list", false, true, "#007EC8"),
-            R.drawable.do_jsjx to listOf("智能分析", "", false, true, "#04B2AC"),
-            R.drawable.do_qkhx to listOf("客户营销", "", false, true, "#04B2AC"),
-            R.drawable.do_dwfx to listOf("对标对比", "", false, true, "#04B2AC"),
-            R.drawable.do_fyhs to listOf("独立核算", "", false, true, "#04B2AC")
+            R.drawable.do_lhb to listOf("龙虎榜", "app-winner-list", false, true, "#007EC8"),
+            R.drawable.do_znfx to listOf("智能分析", "app-inteligent-analysis", false, true, "#007EC8"),
+            R.drawable.do_khyx to listOf("客户营销", "app-client-kpi", false, true, "#007EC8"),
+            R.drawable.do_dbdb to listOf("对标对比", "", false, true, "#04B2AC"),
+            R.drawable.do_dlhs to listOf("独立核算", "", false, true, "#04B2AC")
     )
     private var apps = mapOf(
-            Pair("我的钱袋", mapOf(
-                    R.drawable.do_jsjx to listOf("即时绩效", "app-just-now-performance", false, true, "#004E97"),
-                    R.drawable.do_kpi to listOf("KPI考核", "h5/kpi/kpi.html", false, true, "#004E97"),
-                    R.drawable.do_yjjl to listOf("佣金奖励", "h5/yongjinjiangli/yongjinjiangli.html", false, false, "")
+            Pair("人事管理", mapOf(
+                    R.drawable.do_kqdk to listOf("考勤打卡", "", false, true, "#004E97"),
+                    R.drawable.do_sp to listOf("审批", "", false, true, "#004E97"),
+                    R.drawable.do_qj to listOf("请假", "", false, false, ""),
+                    R.drawable.do_chuc to listOf("出差", "", false, false, "")
             )),
-            Pair("客户营销", mapOf(
-                    R.drawable.do_qkhx to listOf("潜客画像", "", false, false, ""),
-                    R.drawable.do_ddgl to listOf("订单管理", "", false, false, ""),
-                    R.drawable.do_qkfx to listOf("潜客分析", "app-client", false, true, "#1C6EC8"),
-                    R.drawable.do_cjfx to listOf("成交分析", "h5/chengjiaofenxi/chengjiaofenxi.html", false, false, ""),
-                    R.drawable.do_zbfx to listOf("战败分析", "", false, false, ""),
-                    R.drawable.do_kczy to listOf("库存资源", "", false, false, "")
+            Pair("OMS系统", mapOf(
+                    R.drawable.do_xcyd to listOf("新车预定", "", false, false, ""),
+                    R.drawable.do_xcxs to listOf("新车销售", "", false, false, ""),
+                    R.drawable.do_dlhs2 to listOf("独立核算", "", false, true, "#1C6EC8")
             )),
-            Pair("对标对比", mapOf(
-                    R.drawable.do_zcdb to listOf("政策对标", "h5/kaohe/kaohe.html", false, true, "#004E97"),
-                    R.drawable.do_dwfx to listOf("多维分析", "", false, false, ""),
-                    R.drawable.do_sjdb to listOf("数据对比", "", false, false, "")
-            )),
-            Pair("独立核算", mapOf(
-                    R.drawable.do_mbdc to listOf("目标达成", "app-goal-get", false, true, "#004E97"),
-                    R.drawable.do_tdyj to listOf("团队业绩", "h5/tuanduiyeji/tuanduiyeji.html", false, false, ""),
-                    R.drawable.do_fyhs to listOf("费用核算", "h5/hesuan/hesuan.html", false, true, "#004E97"),
-                    R.drawable.do_xyzd to listOf("效益最大", "h5/xiaoyi_big/xiaoyi_big.html", false, false, ""),
-                    R.drawable.do_sjcb to listOf("时间成本", "h5/shijianchengben/shijianchenben.html", false, false, "")
+            Pair("CRM系统", mapOf(
+                    R.drawable.do_crm to listOf("CRM", "", false, true, "#004E97"),
+                    R.drawable.do_add to listOf("添加", "", false, true, "")
             ))
     )
 
@@ -187,6 +177,9 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     val appDrawable: Int = k
 
                     val itemAppItemLayout = LinearLayout(this.context)
+                    if (k === R.drawable.do_add) {
+                        itemAppItemLayout.tag = "add-apps"
+                    }
                     itemAppItemLayout.gravity = Gravity.CENTER
                     itemAppItemLayout.orientation = LinearLayout.VERTICAL
                     itemAppItemLayout.setPadding(0, DisplayUtil.dip2px(this.context!!, 6f), 0, DisplayUtil.dip2px(this.context!!, 6f))
@@ -208,13 +201,17 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     appTxt.text = appTitle
                     itemAppItemLayout.addView(appTxt)
                     itemAppItemLayout.setOnClickListener {
-                        val appIntent = Intent(this@ConsoleFragment.context, AppActivity::class.java)
-                        appIntent.putExtra("titleName", appTitle)
-                        appIntent.putExtra("webUri", webUri)
-                        appIntent.putExtra("fullPage", fullPage)
-                        appIntent.putExtra("titleBarHighlight", titleBarHighlight)
-                        appIntent.putExtra("titleBarColor", titleBarColor)
-                        this@ConsoleFragment.context!!.startActivity(appIntent)
+                        if (it.tag === "add-apps") {
+
+                        } else {
+                            val appIntent = Intent(this@ConsoleFragment.context, AppActivity::class.java)
+                            appIntent.putExtra("titleName", appTitle)
+                            appIntent.putExtra("webUri", webUri)
+                            appIntent.putExtra("fullPage", fullPage)
+                            appIntent.putExtra("titleBarHighlight", titleBarHighlight)
+                            appIntent.putExtra("titleBarColor", titleBarColor)
+                            this@ConsoleFragment.context!!.startActivity(appIntent)
+                        }
                     }
                     addView(itemAppItemLayout)
                 }

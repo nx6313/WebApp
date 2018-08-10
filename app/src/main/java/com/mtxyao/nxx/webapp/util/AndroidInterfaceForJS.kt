@@ -17,6 +17,7 @@ import android.widget.TextView
 import com.google.gson.Gson
 import com.just.agentweb.AgentWeb
 import com.mtxyao.nxx.webapp.BaseFragment
+import com.mtxyao.nxx.webapp.LoginActivity
 import com.mtxyao.nxx.webapp.R
 import com.mtxyao.nxx.webapp.SecondActivity
 import com.mtxyao.nxx.webapp.entity.UserData
@@ -33,6 +34,16 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
     @JavascriptInterface
     open fun callAndroid (msg: String, params: String) {
         when (msg) {
+            "exitLogin" -> {
+                deliver.post {
+                    val userData: UserData? = UserDataUtil.getUserData(fragment.context!!)
+                    userData!!.needLogin = true
+                    UserDataUtil.setUserData(fragment.context!!, userData)
+                    fragment.activity!!.finish()
+                    val loginIntent = Intent(fragment.context, LoginActivity::class.java)
+                    fragment.context!!.startActivity(loginIntent)
+                }
+            }
             "updateTitleBar" -> {
                 deliver.post {
                     val pars = JSONObject(params)

@@ -75,10 +75,18 @@ abstract class BaseWebActivity : AppCompatActivity() {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back)
             this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#FFFFFF"))
+            val titleBtnWrap = this.findViewById<LinearLayout>(R.id.titleBtnWrap)
+            if (titleBtnWrap != null) {
+                titleBtnWrap.tag = "highlight"
+            }
         } else {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             this.findViewById<ImageView>(R.id.pageBack).setImageResource(R.drawable.back_dark)
             this.findViewById<TextView>(R.id.appTitle).setTextColor(Color.parseColor("#212121"))
+            val titleBtnWrap = this.findViewById<LinearLayout>(R.id.titleBtnWrap)
+            if (titleBtnWrap != null) {
+                titleBtnWrap.tag = "dark"
+            }
         }
         if (pageOpt.webViewFull) {
             val webWrapLayout = this.findViewById<SmartRefreshLayout>(R.id.smartRefreshLayout)
