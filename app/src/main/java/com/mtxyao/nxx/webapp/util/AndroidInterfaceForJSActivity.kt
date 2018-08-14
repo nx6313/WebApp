@@ -35,10 +35,12 @@ import java.io.File
 import java.io.Serializable
 import java.math.BigDecimal
 
-class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
+class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, statusBar: View?, titleWrap: View?) {
     private var deliver: Handler = Handler(Looper.getMainLooper())
     private var activity: BaseWebActivity = fgt
     private var mAgentWeb: AgentWeb = agentWeb
+    private var sBar: View ? = statusBar
+    private var tWrap: View ? = titleWrap
     private var breviaryBitmaps: MutableList<Uri> = mutableListOf()
     private var masterBitmaps: MutableList<Uri> = mutableListOf()
     private var selectIndexList: MutableList<Int> = mutableListOf()
@@ -49,6 +51,25 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
             "saveUserInfo" -> {
                 deliver.post {
                     callByAndroid(msg, null, null)
+                }
+            }
+            "updateTitleBar" -> {
+                deliver.post {
+                    val pars = JSONObject(params)
+                    if (pars.has("title")) {
+                        tWrap!!.findViewById<TextView>(R.id.appTitle).text = pars["title"] as String
+                    }
+                    if (pars.has("bg") && pars["bg"] != "") {
+                        sBar!!.setBackgroundColor(Color.parseColor(pars["bg"] as String))
+                        tWrap!!.setBackgroundColor(Color.parseColor(pars["bg"] as String))
+                    }
+                    if (pars.has("dos")) {
+                        if (pars.getBoolean("dos")) {
+                            tWrap!!.findViewById<LinearLayout>(R.id.titleBtnWrap).visibility = View.VISIBLE
+                        } else {
+                            tWrap!!.findViewById<LinearLayout>(R.id.titleBtnWrap).visibility = View.GONE
+                        }
+                    }
                 }
             }
             "back" -> {
@@ -366,18 +387,31 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb) {
                                             }
                                             contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
                                         }
+                                        1 -> {
+                                            contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
+                                            contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.GONE
+                                            ComFun.showToast(activity, "最近暂无图片", Toast.LENGTH_SHORT)
+                                        }
                                     }
                                 }
                             }
                             Thread(Runnable {
-                                val recentlyImages = ComFun.getRecentlyPhotoPath(activity, 6)
-                                if (recentlyImages.size > 0) {
-                                    val bundle = Bundle()
-                                    bundle.putSerializable("recentlySerializable", RecentlySerializable(recentlyImages))
-                                    val msg = Message()
-                                    msg.what = 0
-                                    msg.data = bundle
-                                    recentlyHandler.sendMessage(msg)
+                                if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), BaseWebActivity.REQUEST_PERMISSION_READ_EXTERNAL_STORAGE)
+                                } else {
+                                    val recentlyImages = ComFun.getRecentlyPhotoPath(activity, 6)
+                                    if (recentlyImages.size > 0) {
+                                        val bundle = Bundle()
+                                        bundle.putSerializable("recentlySerializable", RecentlySerializable(recentlyImages))
+                                        val msg = Message()
+                                        msg.what = 0
+                                        msg.data = bundle
+                                        recentlyHandler.sendMessage(msg)
+                                    } else {
+                                        val msg = Message()
+                                        msg.what = 1
+                                        recentlyHandler.sendMessage(msg)
+                                    }
                                 }
                             }).start()
                         }

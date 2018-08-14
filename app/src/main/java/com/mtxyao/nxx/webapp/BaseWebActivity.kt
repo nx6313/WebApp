@@ -45,7 +45,8 @@ abstract class BaseWebActivity : AppCompatActivity() {
         open var PICKER_PIC: Int = 1
         open var PICKER_PHOTO: Int = 2
         open var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
-        open var REQUEST_CODE_ASK_CALL_PHONE: Int = 4
+        open var REQUEST_PERMISSION_READ_EXTERNAL_STORAGE: Int = 4
+        open var REQUEST_CODE_ASK_CALL_PHONE: Int = 5
         open var imageUri: Uri ? = null
         open var MSG_SELECT_IMAGE: Int = 5
         open var webEventName: String ? = null
@@ -110,7 +111,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
 
         var pageUrl = Urls.WEB_BEFORE
         if (setPageUrl().indexOf(".html") > 0) {
-            pageUrl += "/${setPageUrl()}"
+            pageUrl = "http://m.dachangjr.com/${setPageUrl()}"
         } else {
             if (setPageUrl() != "") {
                 pageUrl += "#/${setPageUrl()}"
@@ -150,7 +151,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 .createAgentWeb()
                 .ready()
                 .go(pageUrl)
-        mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJSActivity(this, mAgentWeb!!))
+        mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJSActivity(this, mAgentWeb!!, this.findViewById<View>(R.id.statusBar), this.findViewById<RelativeLayout>(R.id.titleBar)))
         mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
         mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true
         mAgentWeb!!.agentWebSettings.webSettings.loadsImagesAutomatically = true // 支持自动加载图片

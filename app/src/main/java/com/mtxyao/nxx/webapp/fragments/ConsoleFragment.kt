@@ -19,10 +19,10 @@ import org.json.JSONObject
 class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewListener {
     private var topApps = mapOf(
             R.drawable.do_lhb to listOf("龙虎榜", "app-winner-list", false, true, "#007EC8"),
-            R.drawable.do_znfx to listOf("智能分析", "app-inteligent-analysis", false, true, "#007EC8"),
+            R.drawable.do_znfx to listOf("即时绩效", "app-inteligent-analysis", false, true, "#007EC8"),
             R.drawable.do_khyx to listOf("客户营销", "app-client-kpi", false, true, "#007EC8"),
-            R.drawable.do_dbdb to listOf("对标对比", "", false, true, "#04B2AC"),
-            R.drawable.do_dlhs to listOf("独立核算", "", false, true, "#04B2AC")
+            R.drawable.do_dbdb to listOf("智能分析", "h5/kaohe/kaohe.html", false, true, "#004E97"),
+            R.drawable.do_dlhs to listOf("独立核算", "h5/hesuan/hesuan.html", false, true, "#004E97")
     )
     private var apps = mapOf(
             Pair("人事管理", mapOf(
