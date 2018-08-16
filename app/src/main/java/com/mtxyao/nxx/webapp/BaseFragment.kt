@@ -38,10 +38,10 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
     private var statusBar: View ? = null
     private var pageSwipeRefresh: SwipeRefreshLayout ? = null
     companion object {
-        open var PICKER_PIC: Int = 1
-        open var PICKER_PHOTO: Int = 2
-        open var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
-        open var imageUri: Uri ? = null
+        var PICKER_PIC: Int = 1
+        var PICKER_PHOTO: Int = 2
+        var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
+        var imageUri: Uri ? = null
     }
 
     init {
@@ -241,7 +241,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                 }
                 getPickerImage(bitmap, pickerUri)
                 if (pickerUri !== null) {
-                    cropRawPhoto(pickerUri!!)
+                    cropRawPhoto(pickerUri)
                 }
             }
             PICKER_PIC -> {
@@ -258,7 +258,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                 }
                 getPickerImage(bitmap, pickerUri)
                 if (pickerUri !== null) {
-                    cropRawPhoto(pickerUri!!)
+                    cropRawPhoto(pickerUri)
                 }
             }
             UCrop.REQUEST_CROP -> {
@@ -304,12 +304,10 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
     private fun getImagePath (uri: Uri, selection: String?) : String? {
         var path: String ? = null
         val cursor: Cursor = this.context!!.contentResolver.query(uri, null, selection, null, null)
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-            }
-            cursor.close()
+        if (cursor.moveToFirst()) {
+            path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
         }
+        cursor.close()
         return path
     }
 

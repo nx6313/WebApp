@@ -25,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
 
         val userData: UserData? = UserDataUtil.getUserData(this)
         if (userData != null) {
-            if (userData.needLogin!!) etUserLoginPhone.text = Editable.Factory.getInstance().newEditable(userData!!.user!!.phone)
+            if (userData.needLogin!!) etUserLoginPhone.text = Editable.Factory.getInstance().newEditable(userData.user!!.phone)
         }
     }
 
@@ -49,6 +49,7 @@ class LoginActivity : AppCompatActivity() {
                                     UserDataUtil.setUserData(this@LoginActivity, userData)
                                     UserDataUtil.setUserId(this@LoginActivity, userData.user!!.id!!)
 
+                                    ComFun.initJPushServer(this@LoginActivity)
                                     val mainIntent = Intent(this@LoginActivity, MainActivity::class.java)
                                     startActivity(mainIntent)
                                     finish()

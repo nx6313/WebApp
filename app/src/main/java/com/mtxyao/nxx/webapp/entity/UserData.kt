@@ -4,7 +4,7 @@ class UserData(login: Long, base: Long, need: Boolean, userInfo: UserInfo) {
     var loginDate: Long ? = null // 用户登录时间
     var basedate: Long ? = null // 用户数据基础日期
     var needLogin: Boolean ? = null // 每次程序启动到欢迎页面时，判断是否需要登录
-    open var user: UserInfo ? = null // 用户信息
+    var user: UserInfo ? = null // 用户信息
 
     init {
         loginDate = login

@@ -14,6 +14,7 @@ import android.support.v4.content.FileProvider
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.widget.TextView
+import cn.jpush.android.api.JPushInterface
 import com.google.gson.Gson
 import com.just.agentweb.AgentWeb
 import com.mtxyao.nxx.webapp.BaseFragment
@@ -32,7 +33,7 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
     private var tWrap: View ? = titleWrap
 
     @JavascriptInterface
-    open fun callAndroid (msg: String, params: String) {
+    fun callAndroid (msg: String, params: String) {
         when (msg) {
             "exitLogin" -> {
                 deliver.post {
@@ -40,6 +41,7 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
                     userData!!.needLogin = true
                     UserDataUtil.setUserData(fragment.context!!, userData)
                     fragment.activity!!.finish()
+                    JPushInterface.stopPush(fragment.context)
                     val loginIntent = Intent(fragment.context, LoginActivity::class.java)
                     fragment.context!!.startActivity(loginIntent)
                 }
@@ -111,16 +113,16 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
         when (jsFunName) {
             "saveUserInfo" -> {
                 val userData: UserData ? = UserDataUtil.getUserData(fragment.context!!)
-                mAgentWeb!!.jsAccessEntrace.quickCallJs(jsFunName, Gson().toJson(userData))
+                mAgentWeb.jsAccessEntrace.quickCallJs(jsFunName, Gson().toJson(userData))
             }
         }
     }
 
     @JavascriptInterface
-    open fun setTimeOut (event: String, duration: Int) {
+    fun setTimeOut (event: String, duration: Int) {
         Handler().postDelayed({
             deliver.post {
-                mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", event)
+                mAgentWeb.jsAccessEntrace.quickCallJs("androidEvent", event)
             }
         }, duration.toLong())
     }

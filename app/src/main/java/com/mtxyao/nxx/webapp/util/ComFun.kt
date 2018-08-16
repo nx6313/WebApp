@@ -16,6 +16,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.Window
@@ -24,7 +25,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import cn.jpush.android.api.JPushInterface
 import com.mtxyao.nxx.webapp.R
+import com.mtxyao.nxx.webapp.entity.UserData
 import java.io.File
 import java.io.FileOutputStream
 
@@ -220,7 +223,6 @@ object ComFun {
         if (!file?.exists()!!) {
             path = Environment.getExternalStorageDirectory().toString() + "/Pictures/Screenshots"
         }
-        file = null
         return path
     }
 
@@ -263,5 +265,17 @@ object ComFun {
             return bitmap.byteCount
         }
         return bitmap.rowBytes * bitmap.height
+    }
+
+    /**
+     * 初始化极光推送服务
+     */
+    fun initJPushServer (context: Context) {
+        val userData: UserData? = UserDataUtil.getUserData(context)
+        JPushInterface.resumePush(context)
+        Log.d("isPushStopped", JPushInterface.isPushStopped(context).toString())
+        JPushInterface.setChannel(context, "channel_${android.os.Build.BRAND}") // APK分发渠道
+        JPushInterface.setAlias(context, 1, "${userData!!.user!!.id}")
+        JPushInterface.setTags(context, 2, setOf("${userData!!.user!!.companyId}"))
     }
 }

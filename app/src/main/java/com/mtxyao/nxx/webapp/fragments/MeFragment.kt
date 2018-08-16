@@ -67,7 +67,7 @@ class MeFragment : BaseFragment(true) {
                             uploadProgressBar!!.max = progress!!.totalSize.toInt()
                         }
                         uploadProgressBar!!.progress = progress!!.currentSize.toInt()
-                        if (progress!!.currentSize.toInt() == progress!!.totalSize.toInt()) {
+                        if (progress.currentSize.toInt() == progress.totalSize.toInt()) {
                             uploadDialog!!.dismiss()
                             uploadDialog = null
                         }

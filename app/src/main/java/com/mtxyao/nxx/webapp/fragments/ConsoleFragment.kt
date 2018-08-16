@@ -95,7 +95,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                 .execute(object: StringCallback() {
                     override fun onSuccess(response: Response<String>?) {
                         if (response != null) {
-                            val data = JSONObject(response!!.body())
+                            val data = JSONObject(response.body())
                             if (data.has("code") && data.getString("code") == "1") {
                                 informMsg.text = data.getJSONArray("list").getJSONObject(0).getString("noticeContent")
                             }
@@ -177,7 +177,7 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     val appDrawable: Int = k
 
                     val itemAppItemLayout = LinearLayout(this.context)
-                    if (k === R.drawable.do_add) {
+                    if (k == R.drawable.do_add) {
                         itemAppItemLayout.tag = "add-apps"
                     }
                     itemAppItemLayout.gravity = Gravity.CENTER

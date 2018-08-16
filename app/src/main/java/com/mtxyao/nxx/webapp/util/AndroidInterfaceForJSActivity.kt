@@ -35,18 +35,19 @@ import java.io.File
 import java.io.Serializable
 import java.math.BigDecimal
 
-class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, statusBar: View?, titleWrap: View?) {
+class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, statusBar: View?, titleWrap: View?, pageOp: PageOpt?) {
     private var deliver: Handler = Handler(Looper.getMainLooper())
     private var activity: BaseWebActivity = fgt
     private var mAgentWeb: AgentWeb = agentWeb
     private var sBar: View ? = statusBar
     private var tWrap: View ? = titleWrap
+    private var pageOpt: PageOpt ? = pageOp
     private var breviaryBitmaps: MutableList<Uri> = mutableListOf()
     private var masterBitmaps: MutableList<Uri> = mutableListOf()
     private var selectIndexList: MutableList<Int> = mutableListOf()
 
     @JavascriptInterface
-    open fun callAndroid (msg: String, params: String) {
+    fun callAndroid (msg: String, params: String) {
         when (msg) {
             "saveUserInfo" -> {
                 deliver.post {
@@ -62,6 +63,13 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                     if (pars.has("bg") && pars["bg"] != "") {
                         sBar!!.setBackgroundColor(Color.parseColor(pars["bg"] as String))
                         tWrap!!.setBackgroundColor(Color.parseColor(pars["bg"] as String))
+                    } else {
+                        var defalutBg = "#ffffff"
+                        if (pageOpt!!.titleBarColor != "") {
+                            defalutBg = pageOpt!!.titleBarColor
+                        }
+                        sBar!!.setBackgroundColor(Color.parseColor(defalutBg))
+                        tWrap!!.setBackgroundColor(Color.parseColor(defalutBg))
                     }
                     if (pars.has("dos")) {
                         if (pars.getBoolean("dos")) {
@@ -86,13 +94,13 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                             val callIntent = Intent(Intent.ACTION_CALL)
                             val data = Uri.parse("tel:$params")
                             callIntent.data = data
-                            activity.startActivity(callIntent!!)
+                            activity.startActivity(callIntent)
                         }
                     } else {
                         val callIntent = Intent(Intent.ACTION_CALL)
                         val data = Uri.parse("tel:$params")
                         callIntent.data = data
-                        activity.startActivity(callIntent!!)
+                        activity.startActivity(callIntent)
                     }
                 }
             }
@@ -296,7 +304,7 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                                     when (msg!!.what) {
                                         0 -> {
                                             contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.VISIBLE
-                                            val recentlyImages = (msg!!.data.getSerializable("recentlySerializable") as RecentlySerializable).recentlyImages
+                                            val recentlyImages = (msg.data.getSerializable("recentlySerializable") as RecentlySerializable).recentlyImages
                                             for ((recentlyIndex, recently) in recentlyImages.withIndex()) {
                                                 val imageBitmapMaster = ComFun.getBitMapByPath(recently.second, activity)
                                                 val imageBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(recently.second), 100, 140)
@@ -544,24 +552,24 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
         when (jsFunName) {
             "saveUserInfo" -> {
                 val userData: UserData ? = UserDataUtil.getUserData(activity)
-                mAgentWeb!!.jsAccessEntrace.quickCallJs(jsFunName, Gson().toJson(userData))
+                mAgentWeb.jsAccessEntrace.quickCallJs(jsFunName, Gson().toJson(userData))
             }
             "androidEvent" -> {
-                mAgentWeb!!.jsAccessEntrace.quickCallJs(jsFunName, event, params)
+                mAgentWeb.jsAccessEntrace.quickCallJs(jsFunName, event, params)
             }
         }
     }
 
     @JavascriptInterface
-    open fun setTimeOut (event: String, duration: Int) {
+    fun setTimeOut (event: String, duration: Int) {
         Handler().postDelayed({
             deliver.post {
-                mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", event)
+                mAgentWeb.jsAccessEntrace.quickCallJs("androidEvent", event)
             }
         }, duration.toLong())
     }
 
     private class RecentlySerializable(recentlyList: MutableList<Pair<Long, String>>) : Serializable {
-        open val recentlyImages: MutableList<Pair<Long, String>> = recentlyList
+        val recentlyImages: MutableList<Pair<Long, String>> = recentlyList
     }
 }

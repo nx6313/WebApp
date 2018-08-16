@@ -1,6 +1,7 @@
 package com.mtxyao.nxx.webapp.util
 
 import android.app.Application
+import cn.jpush.android.api.JPushInterface
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.cache.CacheEntity
 import com.lzy.okgo.cache.CacheMode
@@ -20,6 +21,7 @@ class MyApplication : Application() {
         super.onCreate()
         instance = this
 
+        // 初始化OkGo
         val headers = HttpHeaders()
         val params = HttpParams()
         params.put("deviceType", "android")
@@ -41,5 +43,9 @@ class MyApplication : Application() {
                 .setRetryCount(3)
                 .addCommonHeaders(headers)
                 .addCommonParams(params)
+
+        // 初始化JPush
+        JPushInterface.setDebugMode(true)
+        JPushInterface.stopPush(this)
     }
 }

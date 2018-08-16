@@ -48,7 +48,7 @@ class SecondActivity : BaseWebActivity() {
         private var titleDos: String = dos
         private var pageParams: String = params
 
-        open fun getTitleDos () : MutableList<MutableMap<String, Any>> {
+        fun getTitleDos () : MutableList<MutableMap<String, Any>> {
             val titleDosArr = JSONArray(titleDos)
             val mList: MutableList<MutableMap<String, Any>> = mutableListOf()
             for (i in 0..(titleDosArr.length() - 1)) {
@@ -60,7 +60,7 @@ class SecondActivity : BaseWebActivity() {
             }
             return mList
         }
-        open fun getPageParams () : MutableMap<String, Any> {
+        fun getPageParams () : MutableMap<String, Any> {
             val pageParamsObj = JSONObject(pageParams)
             val mMap: MutableMap<String, Any> = mutableMapOf()
             for (k in pageParamsObj.keys()) {

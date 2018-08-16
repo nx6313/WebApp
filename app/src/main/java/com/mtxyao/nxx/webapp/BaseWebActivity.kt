@@ -41,15 +41,15 @@ import java.net.URI
 abstract class BaseWebActivity : AppCompatActivity() {
     var mAgentWeb: AgentWeb? = null
     companion object {
-        open var baseWebHandler: Handler ? = null
-        open var PICKER_PIC: Int = 1
-        open var PICKER_PHOTO: Int = 2
-        open var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
-        open var REQUEST_PERMISSION_READ_EXTERNAL_STORAGE: Int = 4
-        open var REQUEST_CODE_ASK_CALL_PHONE: Int = 5
-        open var imageUri: Uri ? = null
-        open var MSG_SELECT_IMAGE: Int = 5
-        open var webEventName: String ? = null
+        var baseWebHandler: Handler ? = null
+        var PICKER_PIC: Int = 1
+        var PICKER_PHOTO: Int = 2
+        var REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE: Int = 3
+        var REQUEST_PERMISSION_READ_EXTERNAL_STORAGE: Int = 4
+        var REQUEST_CODE_ASK_CALL_PHONE: Int = 5
+        var imageUri: Uri ? = null
+        var MSG_SELECT_IMAGE: Int = 5
+        var webEventName: String ? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,7 +151,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 .createAgentWeb()
                 .ready()
                 .go(pageUrl)
-        mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJSActivity(this, mAgentWeb!!, this.findViewById<View>(R.id.statusBar), this.findViewById<RelativeLayout>(R.id.titleBar)))
+        mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJSActivity(this, mAgentWeb!!, this.findViewById(R.id.statusBar), this.findViewById<RelativeLayout>(R.id.titleBar), pageOpt))
         mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
         mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true
         mAgentWeb!!.agentWebSettings.webSettings.loadsImagesAutomatically = true // 支持自动加载图片
@@ -173,7 +173,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 super.handleMessage(msg)
                 when (msg!!.what) {
                     MSG_SELECT_IMAGE -> {
-                        val list: MutableList<Uri> = (msg!!.data.getSerializable("baseWebSerializable") as BaseWebSerializable).list
+                        val list: MutableList<Uri> = (msg.data.getSerializable("baseWebSerializable") as BaseWebSerializable).list
                         val bitmaps = mutableListOf<Bitmap>()
                         val uris = mutableListOf<Uri>()
                         val files = mutableListOf<File>()
@@ -182,7 +182,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                             uris.add(u)
                             files.add(File(URI(u.toString())))
                         }
-                        webEventName = msg!!.data.getString("webEventName")
+                        webEventName = msg.data.getString("webEventName")
                         getLatelyImage(bitmaps, uris, files, webEventName)
                     }
                 }
@@ -320,7 +320,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 }
                 getPickerImage(bitmap, pickerUri, File(URI(pickerUri.toString())))
                 if (pickerUri !== null) {
-                    cropRawPhoto(pickerUri!!)
+                    cropRawPhoto(pickerUri)
                 }
             }
             PICKER_PIC -> {
@@ -337,7 +337,7 @@ abstract class BaseWebActivity : AppCompatActivity() {
                 }
                 getPickerImage(bitmap, pickerUri, File(URI(pickerUri.toString())))
                 if (pickerUri !== null) {
-                    cropRawPhoto(pickerUri!!)
+                    cropRawPhoto(pickerUri)
                 }
             }
             UCrop.REQUEST_CROP -> {
@@ -383,12 +383,10 @@ abstract class BaseWebActivity : AppCompatActivity() {
     private fun getImagePath (uri: Uri, selection: String?) : String? {
         var path: String ? = null
         val cursor: Cursor = this.contentResolver.query(uri, null, selection, null, null)
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-            }
-            cursor.close()
+        if (cursor.moveToFirst()) {
+            path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
         }
+        cursor.close()
         return path
     }
 
@@ -408,6 +406,6 @@ abstract class BaseWebActivity : AppCompatActivity() {
     }
 
     class BaseWebSerializable(selectUriList: MutableList<Uri>) : Serializable {
-        open var list: MutableList<Uri> = selectUriList
+        var list: MutableList<Uri> = selectUriList
     }
 }

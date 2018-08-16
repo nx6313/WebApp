@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import com.mtxyao.nxx.webapp.entity.UserData
+import com.mtxyao.nxx.webapp.util.ComFun
 import com.mtxyao.nxx.webapp.util.UserDataUtil
 
 class WelcomeActivity : AppCompatActivity() {
@@ -25,6 +26,7 @@ class WelcomeActivity : AppCompatActivity() {
                     startActivity(loginIntent)
                     finish()
                 } else {
+                    ComFun.initJPushServer(this)
                     val mainIntent = Intent(this, MainActivity::class.java)
                     startActivity(mainIntent)
                     finish()
