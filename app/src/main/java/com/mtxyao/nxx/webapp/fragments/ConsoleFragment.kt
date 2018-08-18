@@ -5,6 +5,10 @@ import android.graphics.Color
 import android.os.Build
 import android.util.TypedValue
 import android.view.*
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationSet
+import android.view.animation.LinearInterpolator
+import android.view.animation.TranslateAnimation
 import android.widget.*
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.callback.StringCallback
@@ -41,6 +45,10 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                     R.drawable.do_add to listOf("添加", "", false, true, "")
             ))
     )
+    private var toDoListTypeToIcon = mapOf(
+            "1" to R.drawable.icon_crm,
+            "2" to R.drawable.icon_todo
+    )
 
     private var scrollView: ObservableScrollView ? = null
     private var mainTopMenu_1: LinearLayout ? = null
@@ -51,6 +59,11 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
     }
 
     override fun initPageData(fragmentView: View) {
+        val toDoList = fragmentView.findViewById<LinearLayout>(R.id.toDoList)
+        toDoList.visibility = View.GONE
+        toDoList.removeAllViews()
+        initToDoList(toDoList)
+
         val topAppsWrap = fragmentView.findViewById<LinearLayout>(R.id.topAppsWrap)
         initTopApps(topAppsWrap, topApps)
         val appsWrap = fragmentView.findViewById<LinearLayout>(R.id.appsWrap)
@@ -102,6 +115,78 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                         }
                     }
                 })
+    }
+
+    private fun initToDoList (parent: ViewGroup) {
+        addToDoListItemView(parent)
+
+        showToDoList(parent)
+    }
+
+    fun initToDoListFromReceiver (data: JSONObject) {
+        if (data.getString("type") == "1") {
+            addToDoListItemView(pageView!!.findViewById<LinearLayout>(R.id.toDoList))
+        }
+    }
+
+    private fun addToDoListItemView (parent: ViewGroup) {
+        val toDoItemLayout = LinearLayout(this@ConsoleFragment.context)
+        toDoItemLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        toDoItemLayout.setPadding(DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 16f), DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 16f))
+        toDoItemLayout.orientation = LinearLayout.HORIZONTAL
+        with(toDoItemLayout) {
+            val icon = ImageView(this@ConsoleFragment.context)
+            val iconLs = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 16f), DisplayUtil.dip2px(this.context!!, 16f))
+            iconLs.gravity = Gravity.CENTER_VERTICAL
+            iconLs.rightMargin = DisplayUtil.dip2px(this.context!!, 6f)
+            icon.layoutParams = iconLs
+            icon.setImageResource(toDoListTypeToIcon["1"]!!)
+            addView(icon)
+
+            val content = TextView(this@ConsoleFragment.context)
+            val contentLs = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            contentLs.gravity = Gravity.CENTER_VERTICAL
+            content.layoutParams = contentLs
+            content.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            content.paint.isFakeBoldText = true
+            content.text = "CRM通知"
+            addView(content)
+
+            val time = TextView(this@ConsoleFragment.context)
+            val timeLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            timeLs.gravity = Gravity.CENTER_VERTICAL
+            time.layoutParams = timeLs
+            time.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            time.text = "18/02/23"
+            addView(time)
+        }
+        parent.addView(toDoItemLayout)
+    }
+
+    private fun showToDoList (parent: ViewGroup) {
+        parent.visibility = View.VISIBLE
+        val toDoListAnim = AnimationSet(true)
+        toDoListAnim.addAnimation(AlphaAnimation(0f, 1f))
+        toDoListAnim.addAnimation(TranslateAnimation(0f, 0f, -4f, 0f))
+        toDoListAnim.interpolator = LinearInterpolator()
+        toDoListAnim.duration = 1200
+        toDoListAnim.fillAfter = true
+        toDoListAnim.cancel()
+        toDoListAnim.reset()
+        parent.startAnimation(toDoListAnim)
+    }
+
+    private fun hideToDoList (parent: ViewGroup) {
+        parent.visibility = View.GONE
+        val toDoListAnim = AnimationSet(true)
+        toDoListAnim.addAnimation(AlphaAnimation(1f, 0f))
+        toDoListAnim.addAnimation(TranslateAnimation(0f, 0f, 0f, -4f))
+        toDoListAnim.interpolator = LinearInterpolator()
+        toDoListAnim.duration = 800
+        toDoListAnim.fillAfter = true
+        toDoListAnim.cancel()
+        toDoListAnim.reset()
+        parent.startAnimation(toDoListAnim)
     }
 
     private fun <K, V> initTopApps (appsWrap: LinearLayout, topApps: Map<K, V>) {

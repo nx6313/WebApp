@@ -1,6 +1,9 @@
 package com.mtxyao.nxx.webapp
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
@@ -20,8 +23,10 @@ import com.mtxyao.nxx.webapp.fragments.WinnersFragment
 import com.mtxyao.nxx.webapp.fragments.ClientFragment
 import com.mtxyao.nxx.webapp.fragments.MeFragment
 import com.mtxyao.nxx.webapp.util.ComFun
+import com.mtxyao.nxx.webapp.util.JpushReceiver
 import com.mtxyao.nxx.webapp.util.MyFragmentPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONObject
 
 class MainActivity : FragmentActivity() {
     private var curFragmentPageIndex: Int = 0
@@ -48,6 +53,11 @@ class MainActivity : FragmentActivity() {
         viewPager.noScroll = true
         viewPager.noCutAnimation = true
         viewPager.offscreenPageLimit = fragmentPair!!.size
+
+        val mainReceiver = MainReceiver(fragmentPair)
+        val filter = IntentFilter()
+        filter.addAction(JpushReceiver.BCS_ACTION_INDEX_MSG)
+        registerReceiver(mainReceiver, filter)
     }
 
     fun toMenu (view: View) {
@@ -100,6 +110,12 @@ class MainActivity : FragmentActivity() {
                     } else {
                         System.exit(0)
                     }
+                    // 实现只在冷启动时显示启动页，即点击返回键与点击HOME键退出效果一致
+//                    val intent = Intent(Intent.ACTION_MAIN)
+//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//                    intent.addCategory(Intent.CATEGORY_HOME)
+//                    startActivity(intent)
+//                    return true
                 }
             }
         }
@@ -129,6 +145,21 @@ class MainActivity : FragmentActivity() {
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
+    }
+
+    class MainReceiver(fragmentPair: List<Pair<String, Fragment>> ?) : BroadcastReceiver() {
+        val fPair: List<Pair<String, Fragment>> ? = fragmentPair
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent!!.action) {
+                JpushReceiver.BCS_ACTION_INDEX_MSG -> {
+                    val data = intent.getStringExtra("data")
+                    if (data != null) {
+                        val dataJson = JSONObject(data)
+                        (fPair!![0].second as ConsoleFragment).initToDoListFromReceiver(dataJson)
+                    }
+                }
+            }
         }
     }
 

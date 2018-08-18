@@ -32,6 +32,7 @@ import java.io.File
 import java.net.URI
 
 abstract class BaseFragment(webView: Boolean) : Fragment() {
+    open var pageView: View ? = null
     private var initWebView: Boolean = false
     var mAgentWeb: AgentWeb? = null
     private var titleWrap: View ? = null
@@ -50,6 +51,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = getFragmentView(inflater, container)
+        pageView = view
         if (initWebView) {
             titleWrap = view.findViewById(R.id.titleBar)
             titleWrap!!.findViewById<ImageView>(R.id.pageBack).setOnClickListener {
