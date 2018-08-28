@@ -26,6 +26,7 @@ import com.mtxyao.nxx.webapp.util.ComFun
 import com.mtxyao.nxx.webapp.util.JpushReceiver
 import com.mtxyao.nxx.webapp.util.MyFragmentPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
 import org.json.JSONObject
 
 class MainActivity : FragmentActivity() {
@@ -155,7 +156,7 @@ class MainActivity : FragmentActivity() {
                 JpushReceiver.BCS_ACTION_INDEX_MSG -> {
                     val data = intent.getStringExtra("data")
                     if (data != null) {
-                        val dataJson = JSONObject(data)
+                        val dataJson = JSONArray(data)
                         (fPair!![0].second as ConsoleFragment).initToDoListFromReceiver(dataJson)
                     }
                 }

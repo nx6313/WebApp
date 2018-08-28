@@ -3,6 +3,7 @@ package com.mtxyao.nxx.webapp.util
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -13,6 +14,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.view.View
 import android.webkit.JavascriptInterface
+import android.widget.LinearLayout
 import android.widget.TextView
 import cn.jpush.android.api.JPushInterface
 import com.google.gson.Gson
@@ -26,11 +28,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
-class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: View?) {
+class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, statusBar: View?, titleWrap: View?, pageOp: PageOpt?) {
     private var deliver: Handler = Handler(Looper.getMainLooper())
     private var fragment: BaseFragment = fgt
     private var mAgentWeb: AgentWeb = agentWeb
+    private var sBar: View ? = statusBar
     private var tWrap: View ? = titleWrap
+    private var pageOpt: PageOpt ? = pageOp
 
     @JavascriptInterface
     fun callAndroid (msg: String, params: String) {
@@ -49,8 +53,27 @@ class AndroidInterfaceForJS(fgt: BaseFragment, agentWeb: AgentWeb, titleWrap: Vi
             "updateTitleBar" -> {
                 deliver.post {
                     val pars = JSONObject(params)
-                    val title: String = pars["title"] as String
-                    tWrap!!.findViewById<TextView>(R.id.pageTitle).text = title
+                    if (pars.has("title")) {
+                        tWrap!!.findViewById<TextView>(R.id.pageTitle).text = pars["title"] as String
+                    }
+                    if (pars.has("bg") && pars["bg"] != "") {
+                        sBar!!.setBackgroundColor(Color.parseColor(pars["bg"] as String))
+                        tWrap!!.setBackgroundColor(Color.parseColor(pars["bg"] as String))
+                    } else {
+                        var defalutBg = "#007EC8"
+                        if (pageOpt!!.titleBarColor != "") {
+                            defalutBg = pageOpt!!.titleBarColor
+                        }
+                        sBar!!.setBackgroundColor(Color.parseColor(defalutBg))
+                        tWrap!!.setBackgroundColor(Color.parseColor(defalutBg))
+                    }
+                    if (pars.has("dos")) {
+                        if (pars.getBoolean("dos")) {
+                            tWrap!!.findViewById<LinearLayout>(R.id.titleBtnWrap).visibility = View.VISIBLE
+                        } else {
+                            tWrap!!.findViewById<LinearLayout>(R.id.titleBtnWrap).visibility = View.GONE
+                        }
+                    }
                 }
             }
             "saveUserInfo" -> {

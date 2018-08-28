@@ -257,6 +257,13 @@ abstract class BaseWebActivity : AppCompatActivity() {
      */
     open fun getLatelyImage(bitmaps: MutableList<Bitmap>?, latelyUris: MutableList<Uri>?, latelyFiles: MutableList<File>?, webEventName: String?) {}
 
+    /**
+     * 通知页面刷新数据
+     */
+    fun refPage () {
+        mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", "refPage")
+    }
+
     class MWebViewClient(webViewGroup: ViewGroup?) : WebViewClient() {
         private var wGroup: ViewGroup ? = null
 

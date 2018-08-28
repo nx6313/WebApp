@@ -18,6 +18,6 @@ class WinnersFragment : BaseFragment(true) {
     }
 
     override fun setPageUrl(): String {
-        return "app-sale-list"
+        return "app-winner-list"
     }
 }

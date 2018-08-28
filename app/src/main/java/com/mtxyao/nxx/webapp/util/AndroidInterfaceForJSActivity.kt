@@ -1,7 +1,7 @@
 package com.mtxyao.nxx.webapp.util
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -34,6 +34,7 @@ import org.json.JSONObject
 import java.io.File
 import java.io.Serializable
 import java.math.BigDecimal
+import java.util.*
 
 class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, statusBar: View?, titleWrap: View?, pageOp: PageOpt?) {
     private var deliver: Handler = Handler(Looper.getMainLooper())
@@ -140,6 +141,8 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                     val event = pars.getString("event")
                     val type = pars.getString("type")
                     val title = if (pars.has("title")) { pars.getString("title") } else { "" }
+                    var dateMin = if (pars.has("dateMin")) { pars.getJSONArray("dateMin") } else { null }
+                    var dateMax = if (pars.has("dateMax")) { pars.getJSONArray("dateMax") } else { null }
                     val has = if (pars.has("has")) { pars.getInt("has") } else { 0 }
                     val max = if (pars.has("max")) { pars.getInt("max") } else { 0 }
                     val outSideCancelable = if (pars.has("outSideCancelable")) { pars.getBoolean("outSideCancelable") } else { true }
@@ -163,12 +166,17 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                                     .setTitleBgColor(Color.parseColor("#FFFFFF")) // 标题背景颜色 Night mode
                                     .setBgColor(Color.parseColor("#FFFFFF")) // 滚轮背景颜色 Night mode
                                     // .setDate(selectedDate) // 如果不设置的话，默认是系统时间*/
-                                    // .setRangDate(startDate, endDate)//起始终止年月日设定
                                     .setLabel("年","月","日","时","分","秒") // 默认设置为年月日时分秒
                                     .isCenterLabel(false) // 是否只显示中间选中项的label文字，false则每项item全部都带有label
                                     .isDialog(false) // 是否显示为对话框样式
-                                    .build()
-                            pvTime.show()
+                            if (dateMin != null && dateMax != null) {
+                                val startDate = Calendar.getInstance()
+                                startDate.set(dateMin.getInt(0), dateMin.getInt(1), dateMin.getInt(2), dateMin.getInt(3), dateMin.getInt(4), dateMin.getInt(5))
+                                val endDate = Calendar.getInstance()
+                                endDate.set(dateMax.getInt(0), dateMax.getInt(1), dateMax.getInt(2), dateMax.getInt(3), dateMax.getInt(4), dateMax.getInt(5))
+                                pvTime.setRangDate(startDate, endDate)//起始终止年月日设定
+                            }
+                            pvTime.build().show()
                         }
                         "option" -> {
                             val pvOptions = OptionsPickerBuilder(activity, OnOptionsSelectListener { options1, options2, options3, v ->
@@ -297,120 +305,13 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                             lp.alpha = 0.3f
                             activity.window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
                             activity.window.attributes = lp
-                            val recentlyHandler = @SuppressLint("HandlerLeak")
-                            object : Handler() {
-                                override fun handleMessage(msg: Message?) {
-                                    super.handleMessage(msg)
-                                    when (msg!!.what) {
-                                        0 -> {
-                                            contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.VISIBLE
-                                            val recentlyImages = (msg.data.getSerializable("recentlySerializable") as RecentlySerializable).recentlyImages
-                                            for ((recentlyIndex, recently) in recentlyImages.withIndex()) {
-                                                val imageBitmapMaster = ComFun.getBitMapByPath(recently.second, activity)
-                                                val imageBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(recently.second), 100, 140)
-                                                val sizeMaster = ComFun.getBitmapSize(imageBitmapMaster)
-                                                val size = ComFun.getBitmapSize(imageBitmap)
-
-                                                breviaryBitmaps.add(ComFun.bitmap2Uri(activity, imageBitmap))
-                                                masterBitmaps.add(ComFun.bitmap2Uri(activity, imageBitmapMaster))
-
-                                                val recentlyItemLayout = RelativeLayout(activity)
-                                                val layoutLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                                                layoutLs.setMargins(DisplayUtil.dip2px(activity, 4f), 0, DisplayUtil.dip2px(activity, 4f), 0)
-                                                recentlyItemLayout.layoutParams = layoutLs
-                                                recentlyItemLayout.isClickable = true
-                                                recentlyItemLayout.isFocusable = true
-                                                recentlyItemLayout.tag = "$size/$sizeMaster/$recentlyIndex"
-                                                recentlyItemLayout.setOnClickListener {
-                                                    val recentlyImg = it.findViewWithTag<ShadeImageView>("recentlyImg")
-                                                    val selectImg = it.findViewWithTag<ImageView>("selectImg")
-                                                    recentlyImg.shade(!recentlyImg.isShade())
-                                                    if (recentlyImg.isShade()) {
-                                                        selectImg.visibility = View.VISIBLE
-                                                    } else {
-                                                        selectImg.visibility = View.GONE
-                                                    }
-                                                    var selectCount = 0
-                                                    var breviarySelectSize = 0.0
-                                                    var masterSelectSize = 0.0
-                                                    selectIndexList.clear()
-                                                    for (c in 0..((it.parent as ViewGroup).childCount - 1)) {
-                                                        if ((it.parent as ViewGroup).getChildAt(c).findViewWithTag<ShadeImageView>("recentlyImg").isShade()) {
-                                                            selectCount++
-                                                            selectIndexList.add(c)
-                                                            val breviarySize = ((it.parent as ViewGroup).getChildAt(c).tag as String).split("/")[0].toDouble() / 1024f
-                                                            val masterSize = ((it.parent as ViewGroup).getChildAt(c).tag as String).split("/")[1].toDouble() / 1024f
-                                                            breviarySelectSize += breviarySize
-                                                            masterSelectSize += masterSize
-                                                        }
-                                                    }
-                                                    if (selectCount > max - has) {
-                                                        ComFun.showToast(activity, "最多可选择 $max 张图片", Toast.LENGTH_SHORT)
-                                                        if (recentlyImg.isShade()) {
-                                                            selectIndexList.remove((it.tag as String).split("/")[2].toInt())
-                                                            recentlyImg.shade(!recentlyImg.isShade())
-                                                            selectImg.visibility = View.GONE
-                                                        }
-                                                    } else {
-                                                        if (selectCount > 0) {
-                                                            var selectImageSizeStr: String
-                                                            selectImageSizeStr = if (masterSelectSize < 1024f) {
-                                                                val selectImageSize = BigDecimal(masterSelectSize).setScale(2, BigDecimal.ROUND_DOWN)
-                                                                "$selectImageSize KB"
-                                                            } else {
-                                                                val selectImageSize = BigDecimal(masterSelectSize / 1024f).setScale(2, BigDecimal.ROUND_DOWN)
-                                                                "$selectImageSize MB"
-                                                            }
-                                                            contentView.findViewById<TextView>(R.id.getPicByPhoto).tag = "breviary"
-                                                            contentView.findViewById<TextView>(R.id.getPicByPhoto).text = "发送 $selectCount 张照片"
-                                                            contentView.findViewById<TextView>(R.id.getPicByCamera).tag = "master"
-                                                            contentView.findViewById<TextView>(R.id.getPicByCamera).text = "发送 $selectCount 张原图（共 $selectImageSizeStr）"
-                                                        } else {
-                                                            contentView.findViewById<TextView>(R.id.getPicByPhoto).tag = "photo"
-                                                            contentView.findViewById<TextView>(R.id.getPicByPhoto).text = "相册"
-                                                            contentView.findViewById<TextView>(R.id.getPicByCamera).tag = "camera"
-                                                            contentView.findViewById<TextView>(R.id.getPicByCamera).text = "拍摄"
-                                                        }
-                                                    }
-                                                }
-
-                                                val recentlyImg = ShadeImageView(activity)
-                                                val recentlyLs = RelativeLayout.LayoutParams(DisplayUtil.dip2px(activity, 100f), DisplayUtil.dip2px(activity, 140f))
-                                                recentlyImg.layoutParams = recentlyLs
-                                                Picasso.with(activity).load(ComFun.bitmap2Uri(activity, imageBitmapMaster)).noFade().centerInside().fit().into(recentlyImg)
-                                                // recentlyImg.setImageBitmap(imageBitmapMaster)
-                                                recentlyImg.tag = "recentlyImg"
-                                                recentlyItemLayout.addView(recentlyImg)
-
-                                                val selectImg = ImageView(activity)
-                                                val selectLs = RelativeLayout.LayoutParams(DisplayUtil.dip2px(activity, 20f), DisplayUtil.dip2px(activity, 20f))
-                                                selectLs.setMargins(DisplayUtil.dip2px(activity, 8f), DisplayUtil.dip2px(activity, 8f), 0, 0)
-                                                selectImg.layoutParams = selectLs
-                                                selectImg.setImageResource(R.drawable.sure)
-                                                selectImg.tag = "selectImg"
-                                                selectImg.visibility = View.GONE
-                                                recentlyItemLayout.addView(selectImg)
-
-                                                contentView.findViewById<LinearLayout>(R.id.recentlyPic).addView(recentlyItemLayout)
-                                            }
-                                            contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
-                                        }
-                                        1 -> {
-                                            contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
-                                            contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.GONE
-                                            ComFun.showToast(activity, "最近暂无图片", Toast.LENGTH_SHORT)
-                                        }
-                                    }
-                                }
-                            }
-                            Thread(Runnable {
-                                if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                    ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), BaseWebActivity.REQUEST_PERMISSION_READ_EXTERNAL_STORAGE)
-                                } else {
-                                    val recentlyImages = ComFun.getRecentlyPhotoPath(activity, 6)
-                                    if (recentlyImages.size > 0) {
+                            val recentlyHandler = RecentlyPhotoHandler(activity, contentView, breviaryBitmaps, masterBitmaps, selectIndexList, max, has)
+                            Handler().postDelayed({
+                                Thread(Runnable {
+                                    val recentlyPics = ConfigDataUtil.getRecentlyPic(activity)
+                                    if (recentlyPics!!.size > 0) {
                                         val bundle = Bundle()
-                                        bundle.putSerializable("recentlySerializable", RecentlySerializable(recentlyImages))
+                                        bundle.putSerializable("recentlySerializable", RecentlySerializable(recentlyPics))
                                         val msg = Message()
                                         msg.what = 0
                                         msg.data = bundle
@@ -420,8 +321,8 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                                         msg.what = 1
                                         recentlyHandler.sendMessage(msg)
                                     }
-                                }
-                            }).start()
+                                }).start()
+                            }, 100)
                         }
                     }
                 }
@@ -430,7 +331,11 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                 val pars = JSONObject(params)
                 val webPath = pars["path"] as String
                 val title = pars["title"] as String
-                val titleDos = (pars["titleDos"] as JSONArray).toString()
+                val titleDos = if (pars.has("titleDos")) {
+                    (pars["titleDos"] as JSONArray).toString()
+                } else {
+                    "[]"
+                }
                 val titleBarColor = pars["titleBarColor"] as String
                 val statusBarStyle = pars["statusBarStyle"] as String
                 val fullPage = pars["fullPage"] as Boolean
@@ -484,7 +389,7 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
                                             titleBtn.setBackgroundResource(R.drawable.border_line_dark_right_)
                                         }
                                     }
-                                    titleBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+                                    titleBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                                     titleBtn.tag = event
                                     titleBtn.text = txt
                                     addView(titleBtn)
@@ -571,5 +476,121 @@ class AndroidInterfaceForJSActivity(fgt: BaseWebActivity, agentWeb: AgentWeb, st
 
     private class RecentlySerializable(recentlyList: MutableList<Pair<Long, String>>) : Serializable {
         val recentlyImages: MutableList<Pair<Long, String>> = recentlyList
+    }
+
+    class RecentlyPhotoHandler(activity: Activity, contentView: View, breviaryBitmaps: MutableList<Uri>, masterBitmaps: MutableList<Uri>, selectIndexList: MutableList<Int>, max: Int, has: Int) : Handler() {
+        private val activity: Activity = activity
+        private var contentView: View = contentView
+        private var breviaryBitmaps: MutableList<Uri> = breviaryBitmaps
+        private var masterBitmaps: MutableList<Uri> = masterBitmaps
+        private var selectIndexList: MutableList<Int> = selectIndexList
+        private var max: Int = max
+        private var has: Int = has
+
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+            when (msg!!.what) {
+                0 -> {
+                    contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.VISIBLE
+                    val recentlyImages = (msg.data.getSerializable("recentlySerializable") as RecentlySerializable).recentlyImages
+                    for ((recentlyIndex, recently) in recentlyImages.withIndex()) {
+//                        val imageBitmapMaster = ComFun.getBitMapByPath(recently.second, activity)
+                        val imageBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(recently.second), 200, 240)
+//                        val sizeMaster = ComFun.getBitmapSize(imageBitmapMaster)
+                        val size = ComFun.getBitmapSize(imageBitmap)
+
+                        breviaryBitmaps.add(ComFun.bitmap2Uri(activity, imageBitmap))
+//                        masterBitmaps.add(ComFun.bitmap2Uri(activity, imageBitmapMaster))
+
+                        val recentlyItemLayout = RelativeLayout(activity)
+                        val layoutLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                        layoutLs.setMargins(DisplayUtil.dip2px(activity, 4f), 0, DisplayUtil.dip2px(activity, 4f), 0)
+                        recentlyItemLayout.layoutParams = layoutLs
+                        recentlyItemLayout.isClickable = true
+                        recentlyItemLayout.isFocusable = true
+//                        recentlyItemLayout.tag = "$size/$sizeMaster/$recentlyIndex"
+                        recentlyItemLayout.tag = "$size/$recentlyIndex"
+                        recentlyItemLayout.setOnClickListener {
+                            val recentlyImg = it.findViewWithTag<ShadeImageView>("recentlyImg")
+                            val selectImg = it.findViewWithTag<ImageView>("selectImg")
+                            recentlyImg.shade(!recentlyImg.isShade())
+                            if (recentlyImg.isShade()) {
+                                selectImg.visibility = View.VISIBLE
+                            } else {
+                                selectImg.visibility = View.GONE
+                            }
+                            var selectCount = 0
+                            var breviarySelectSize = 0.0
+                            var masterSelectSize = 0.0
+                            selectIndexList.clear()
+                            for (c in 0..((it.parent as ViewGroup).childCount - 1)) {
+                                if ((it.parent as ViewGroup).getChildAt(c).findViewWithTag<ShadeImageView>("recentlyImg").isShade()) {
+                                    selectCount++
+                                    selectIndexList.add(c)
+                                    val breviarySize = ((it.parent as ViewGroup).getChildAt(c).tag as String).split("/")[0].toDouble() / 1024f
+                                    val masterSize = ((it.parent as ViewGroup).getChildAt(c).tag as String).split("/")[1].toDouble() / 1024f
+                                    breviarySelectSize += breviarySize
+                                    masterSelectSize += masterSize
+                                }
+                            }
+                            if (selectCount > max - has) {
+                                ComFun.showToast(activity, "最多可选择 $max 张图片", Toast.LENGTH_SHORT)
+                                if (recentlyImg.isShade()) {
+//                                    selectIndexList.remove((it.tag as String).split("/")[2].toInt())
+                                    selectIndexList.remove((it.tag as String).split("/")[1].toInt())
+                                    recentlyImg.shade(!recentlyImg.isShade())
+                                    selectImg.visibility = View.GONE
+                                }
+                            } else {
+                                if (selectCount > 0) {
+                                    var selectImageSizeStr: String
+                                    selectImageSizeStr = if (breviarySelectSize < 1024f) {
+                                        val selectImageSize = BigDecimal(breviarySelectSize).setScale(2, BigDecimal.ROUND_DOWN)
+                                        "$selectImageSize KB"
+                                    } else {
+                                        val selectImageSize = BigDecimal(breviarySelectSize / 1024f).setScale(2, BigDecimal.ROUND_DOWN)
+                                        "$selectImageSize MB"
+                                    }
+                                    contentView.findViewById<TextView>(R.id.getPicByPhoto).tag = "breviary"
+                                    contentView.findViewById<TextView>(R.id.getPicByPhoto).text = "发送 $selectCount 张照片（共 $selectImageSizeStr）"
+//                                    contentView.findViewById<TextView>(R.id.getPicByCamera).tag = "master"
+//                                    contentView.findViewById<TextView>(R.id.getPicByCamera).text = "发送 $selectCount 张原图（共 $selectImageSizeStr）"
+                                } else {
+                                    contentView.findViewById<TextView>(R.id.getPicByPhoto).tag = "photo"
+                                    contentView.findViewById<TextView>(R.id.getPicByPhoto).text = "相册"
+//                                    contentView.findViewById<TextView>(R.id.getPicByCamera).tag = "camera"
+//                                    contentView.findViewById<TextView>(R.id.getPicByCamera).text = "拍摄"
+                                }
+                            }
+                        }
+
+                        val recentlyImg = ShadeImageView(activity)
+                        val recentlyLs = RelativeLayout.LayoutParams(DisplayUtil.dip2px(activity, 100f), DisplayUtil.dip2px(activity, 140f))
+                        recentlyImg.layoutParams = recentlyLs
+                        Picasso.with(activity).load(ComFun.bitmap2Uri(activity, imageBitmap)).noFade().centerInside().fit().into(recentlyImg)
+                        // recentlyImg.setImageBitmap(imageBitmapMaster)
+                        recentlyImg.tag = "recentlyImg"
+                        recentlyItemLayout.addView(recentlyImg)
+
+                        val selectImg = ImageView(activity)
+                        val selectLs = RelativeLayout.LayoutParams(DisplayUtil.dip2px(activity, 20f), DisplayUtil.dip2px(activity, 20f))
+                        selectLs.setMargins(DisplayUtil.dip2px(activity, 8f), DisplayUtil.dip2px(activity, 8f), 0, 0)
+                        selectImg.layoutParams = selectLs
+                        selectImg.setImageResource(R.drawable.sure)
+                        selectImg.tag = "selectImg"
+                        selectImg.visibility = View.GONE
+                        recentlyItemLayout.addView(selectImg)
+
+                        contentView.findViewById<LinearLayout>(R.id.recentlyPic).addView(recentlyItemLayout)
+                    }
+                    contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
+                }
+                1 -> {
+                    contentView.findViewById<TextView>(R.id.getRecentlyLoading).visibility = View.GONE
+                    contentView.findViewById<HorizontalScrollView>(R.id.recentlyPicScrollView).visibility = View.GONE
+                    ComFun.showToast(activity, "最近暂无图片", Toast.LENGTH_SHORT)
+                }
+            }
+        }
     }
 }

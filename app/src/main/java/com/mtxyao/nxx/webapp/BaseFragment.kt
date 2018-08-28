@@ -107,7 +107,7 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                     .createAgentWeb()
                     .ready()
                     .go(pageUrl)
-            mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJS(this, mAgentWeb!!, titleWrap!!))
+            mAgentWeb!!.jsInterfaceHolder.addJavaObject("android", AndroidInterfaceForJS(this, mAgentWeb!!, statusBar, titleWrap, pageOpt))
             mAgentWeb!!.agentWebSettings.webSettings.javaScriptEnabled = true
             mAgentWeb!!.agentWebSettings.webSettings.domStorageEnabled = true
             mAgentWeb!!.agentWebSettings.webSettings.loadsImagesAutomatically = true // 支持自动加载图片
@@ -123,8 +123,12 @@ abstract class BaseFragment(webView: Boolean) : Fragment() {
                 mAgentWeb!!.agentWebSettings.webSettings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
             }
         }
-        initPageData(view)
         return view
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        initPageData(pageView!!)
     }
 
     override fun onPause() {

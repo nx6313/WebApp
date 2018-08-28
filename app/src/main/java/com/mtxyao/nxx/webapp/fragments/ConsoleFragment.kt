@@ -14,11 +14,13 @@ import com.lzy.okgo.OkGo
 import com.lzy.okgo.callback.StringCallback
 import com.lzy.okgo.model.Response
 import com.mtxyao.nxx.webapp.*
-import com.mtxyao.nxx.webapp.util.ComFun
-import com.mtxyao.nxx.webapp.util.DisplayUtil
-import com.mtxyao.nxx.webapp.util.ObservableScrollView
-import com.mtxyao.nxx.webapp.util.Urls
+import com.mtxyao.nxx.webapp.entity.IndexMsg
+import com.mtxyao.nxx.webapp.util.*
+import kotlinx.android.synthetic.main.fragment_console.*
+import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewListener {
     private var topApps = mapOf(
@@ -29,25 +31,23 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
             R.drawable.do_dlhs to listOf("独立核算", "h5/hesuan/hesuan.html", false, true, "#004E97")
     )
     private var apps = mapOf(
-            Pair("人事管理", mapOf(
-                    R.drawable.do_kqdk to listOf("考勤打卡", "", false, true, "#004E97"),
-                    R.drawable.do_sp to listOf("审批", "", false, true, "#004E97"),
-                    R.drawable.do_qj to listOf("请假", "", false, false, ""),
-                    R.drawable.do_chuc to listOf("出差", "", false, false, "")
+            Pair("CRM系统", mapOf(
+                    R.drawable.do_crm to listOf("潜客管理", "app-client-manager", false, true, "#004E97"),
+                    R.drawable.do_qkfx to listOf("潜客分析", "", false, true, "#004E97"),
+                    R.drawable.do_cjfx to listOf("成交分析", "", false, true, "#004E97")
             )),
             Pair("OMS系统", mapOf(
                     R.drawable.do_xcyd to listOf("新车预定", "", false, false, ""),
                     R.drawable.do_xcxs to listOf("新车销售", "", false, false, ""),
                     R.drawable.do_dlhs2 to listOf("独立核算", "", false, true, "#1C6EC8")
             )),
-            Pair("CRM系统", mapOf(
-                    R.drawable.do_crm to listOf("CRM", "", false, true, "#004E97"),
+            Pair("人事管理", mapOf(
+                    R.drawable.do_kqdk to listOf("考勤打卡", "", false, true, "#004E97"),
+                    R.drawable.do_sp to listOf("审批", "", false, true, "#004E97"),
+                    R.drawable.do_qj to listOf("请假", "", false, false, ""),
+                    R.drawable.do_chuc to listOf("出差", "", false, false, ""),
                     R.drawable.do_add to listOf("添加", "", false, true, "")
             ))
-    )
-    private var toDoListTypeToIcon = mapOf(
-            "1" to R.drawable.icon_crm,
-            "2" to R.drawable.icon_todo
     )
 
     private var scrollView: ObservableScrollView ? = null
@@ -62,7 +62,6 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
         val toDoList = fragmentView.findViewById<LinearLayout>(R.id.toDoList)
         toDoList.visibility = View.GONE
         toDoList.removeAllViews()
-        initToDoList(toDoList)
 
         val topAppsWrap = fragmentView.findViewById<LinearLayout>(R.id.topAppsWrap)
         initTopApps(topAppsWrap, topApps)
@@ -100,6 +99,16 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
             toDo("newOrder")
         }
 
+        infoInform.visibility = View.GONE
+        initConsoleNote(fragmentView)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initConsoleNote(pageView as View)
+    }
+
+    private fun initConsoleNote (fragmentView: View) {
         val informMsg = fragmentView.findViewById<TextView>(R.id.informMsg)
         OkGo.get<String>(Urls.URL_BEFORE + Urls.URL_INFORM_MSG)
                 .tag(this)
@@ -110,7 +119,11 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
                         if (response != null) {
                             val data = JSONObject(response.body())
                             if (data.has("code") && data.getString("code") == "1") {
+                                if (infoInform.visibility != View.VISIBLE) {
+                                    infoInform.visibility = View.VISIBLE
+                                }
                                 informMsg.text = data.getJSONArray("list").getJSONObject(0).getString("noticeContent")
+                                initToDoList(toDoList)
                             }
                         }
                     }
@@ -118,62 +131,168 @@ class ConsoleFragment : BaseFragment(false), ObservableScrollView.ScrollViewList
     }
 
     private fun initToDoList (parent: ViewGroup) {
-        addToDoListItemView(parent)
+        OkGo.get<String>(Urls.URL_BEFORE + Urls.URL_INFORM_DBSY)
+                .tag(this@ConsoleFragment)
+                .params("lcId", UserDataUtil.getUserId(this@ConsoleFragment.context!!))
+                .params("companyId", UserDataUtil.getUserData(this@ConsoleFragment.context!!)!!.user!!.companyId!!)
+                .params("arrivalTime", SimpleDateFormat("yyyy-MM-dd").format(Date()))
+                .params("leaveTime", SimpleDateFormat("yyyy-MM-dd").format(Date()))
+                .execute(object: StringCallback() {
+                    override fun onSuccess(response: Response<String>?) {
+                        val data = JSONArray(response!!.body())
+                        if (data.length() > 0) {
+                            val dataList: MutableList<IndexMsg> = mutableListOf()
+                            for (i in 0..(data.length() - 1)) {
+                                val indexMsg = IndexMsg()
 
-        showToDoList(parent)
+                                indexMsg.type = (data[i] as JSONObject).getInt("type")
+                                if ((data[i] as JSONObject).has("id")) {
+                                    indexMsg.id = (data[i] as JSONObject).getInt("id")
+                                }
+                                if ((data[i] as JSONObject).has("count")) {
+                                    indexMsg.count = (data[i] as JSONObject).getInt("count")
+                                }
+                                if ((data[i] as JSONObject).has("title")) {
+                                    indexMsg.title = (data[i] as JSONObject).getString("title")
+                                }
+                                if ((data[i] as JSONObject).has("time")) {
+                                    indexMsg.time = (data[i] as JSONObject).getLong("time")
+                                }
+
+                                dataList.add(indexMsg)
+                            }
+
+                            ConfigDataUtil.saveIndexMsg(this@ConsoleFragment.context!!, dataList)
+                            addToDoListItemView(parent)
+                            showToDoList(parent)
+                        } else {
+                            hideToDoList(parent)
+                        }
+                    }
+                })
     }
 
-    fun initToDoListFromReceiver (data: JSONObject) {
-        if (data.getString("type") == "1") {
+    fun initToDoListFromReceiver (data: JSONArray) {
+        if (data.length() > 0) {
+            val dataList: MutableList<IndexMsg> = mutableListOf()
+            for (i in 0..(data.length() - 1)) {
+                val indexMsg = IndexMsg()
+
+                indexMsg.type = (data[i] as JSONObject).getInt("type")
+                if ((data[i] as JSONObject).has("id")) {
+                    indexMsg.id = (data[i] as JSONObject).getInt("id")
+                }
+                if ((data[i] as JSONObject).has("count")) {
+                    indexMsg.count = (data[i] as JSONObject).getInt("count")
+                }
+                if ((data[i] as JSONObject).has("title")) {
+                    indexMsg.title = (data[i] as JSONObject).getString("title")
+                }
+                if ((data[i] as JSONObject).has("time")) {
+                    indexMsg.time = (data[i] as JSONObject).getLong("time")
+                }
+
+                dataList.add(indexMsg)
+            }
+
+            ConfigDataUtil.saveIndexMsg(this@ConsoleFragment.context!!, dataList)
             addToDoListItemView(pageView!!.findViewById<LinearLayout>(R.id.toDoList))
+            showToDoList(pageView!!.findViewById<LinearLayout>(R.id.toDoList))
+        } else {
+            hideToDoList(pageView!!.findViewById<LinearLayout>(R.id.toDoList))
         }
     }
 
     private fun addToDoListItemView (parent: ViewGroup) {
-        val toDoItemLayout = LinearLayout(this@ConsoleFragment.context)
-        toDoItemLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        toDoItemLayout.setPadding(DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 16f), DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 16f))
-        toDoItemLayout.orientation = LinearLayout.HORIZONTAL
-        with(toDoItemLayout) {
-            val icon = ImageView(this@ConsoleFragment.context)
-            val iconLs = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 16f), DisplayUtil.dip2px(this.context!!, 16f))
-            iconLs.gravity = Gravity.CENTER_VERTICAL
-            iconLs.rightMargin = DisplayUtil.dip2px(this.context!!, 6f)
-            icon.layoutParams = iconLs
-            icon.setImageResource(toDoListTypeToIcon["1"]!!)
-            addView(icon)
+        parent.removeAllViews()
+        val indexMsgList = ConfigDataUtil.getIndexMsg(this@ConsoleFragment.context!!)
+        for (i in 0..(indexMsgList!!.size - 1)) {
+            if (indexMsgList[i].count != null && indexMsgList[i].count == 0) {
+                continue
+            }
+            val toDoItemLayout = LinearLayout(this@ConsoleFragment.context)
+            toDoItemLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            toDoItemLayout.setPadding(DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 16f), DisplayUtil.dip2px(this.context!!, 10f), DisplayUtil.dip2px(this.context!!, 16f))
+            toDoItemLayout.orientation = LinearLayout.HORIZONTAL
+            with(toDoItemLayout) {
+                val icon = ImageView(this@ConsoleFragment.context)
+                val iconLs = LinearLayout.LayoutParams(DisplayUtil.dip2px(this.context!!, 16f), DisplayUtil.dip2px(this.context!!, 16f))
+                iconLs.gravity = Gravity.CENTER_VERTICAL
+                iconLs.rightMargin = DisplayUtil.dip2px(this.context!!, 6f)
+                icon.layoutParams = iconLs
+                if (IndexMsg.toDoListTypeToIcon.containsKey(indexMsgList[i].type)) {
+                    icon.setImageResource(IndexMsg.toDoListTypeToIcon[indexMsgList[i].type]!!)
+                } else {
+                    icon.setImageResource(IndexMsg.toDoListTypeToIcon[-1]!!)
+                }
+                addView(icon)
 
-            val content = TextView(this@ConsoleFragment.context)
-            val contentLs = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            contentLs.gravity = Gravity.CENTER_VERTICAL
-            content.layoutParams = contentLs
-            content.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            content.paint.isFakeBoldText = true
-            content.text = "CRM通知"
-            addView(content)
+                val content = TextView(this@ConsoleFragment.context)
+                val contentLs = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                contentLs.gravity = Gravity.CENTER_VERTICAL
+                content.layoutParams = contentLs
+                content.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                content.paint.isFakeBoldText = true
+                when (indexMsgList[i].type) {
+                    IndexMsg.TYPE_CLIENT -> {
+                        content.text = "有${indexMsgList[i].count}条潜客信息待完善"
+                        setOnClickListener {
+                            val clientInIntent = Intent(this.context, ClientInActivity::class.java)
+                            startActivity(clientInIntent)
+                        }
+                    }
+                    else -> {
+                        content.text = "${indexMsgList[i].title}"
+                    }
+                }
+                addView(content)
 
-            val time = TextView(this@ConsoleFragment.context)
-            val timeLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            timeLs.gravity = Gravity.CENTER_VERTICAL
-            time.layoutParams = timeLs
-            time.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            time.text = "18/02/23"
-            addView(time)
+                val time = TextView(this@ConsoleFragment.context)
+                val timeLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                timeLs.gravity = Gravity.CENTER_VERTICAL
+                time.layoutParams = timeLs
+                time.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                time.text = SimpleDateFormat("yy/MM/dd").format(Date(indexMsgList[i].time!!))
+                addView(time)
+            }
+            parent.addView(toDoItemLayout)
+
+            if (i < indexMsgList!!.size - 1) {
+                val lineView = View(this@ConsoleFragment.context)
+                val lineViewLs = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, DisplayUtil.dip2px(this.context!!, 0.4f))
+                lineViewLs.setMargins(DisplayUtil.dip2px(this.context!!, 6f), 0, DisplayUtil.dip2px(this.context!!, 6f), 0)
+                lineView.layoutParams = lineViewLs
+                lineView.setBackgroundColor(Color.parseColor("#43ededed"))
+                parent.addView(lineView)
+            }
         }
-        parent.addView(toDoItemLayout)
     }
 
     private fun showToDoList (parent: ViewGroup) {
-        parent.visibility = View.VISIBLE
-        val toDoListAnim = AnimationSet(true)
-        toDoListAnim.addAnimation(AlphaAnimation(0f, 1f))
-        toDoListAnim.addAnimation(TranslateAnimation(0f, 0f, -4f, 0f))
-        toDoListAnim.interpolator = LinearInterpolator()
-        toDoListAnim.duration = 1200
-        toDoListAnim.fillAfter = true
-        toDoListAnim.cancel()
-        toDoListAnim.reset()
-        parent.startAnimation(toDoListAnim)
+        val indexMsgList = ConfigDataUtil.getIndexMsg(this@ConsoleFragment.context!!)
+        var hasCount = 0
+        for (i in 0..(indexMsgList!!.size - 1)) {
+            if (indexMsgList[i].count != null && indexMsgList[i].count == 0) {
+                continue
+            }
+            hasCount++
+        }
+        if (hasCount > 0) {
+            if (parent.visibility != View.VISIBLE) {
+                parent.visibility = View.VISIBLE
+                val toDoListAnim = AnimationSet(true)
+                toDoListAnim.addAnimation(AlphaAnimation(0f, 1f))
+                toDoListAnim.addAnimation(TranslateAnimation(0f, 0f, -4f, 0f))
+                toDoListAnim.interpolator = LinearInterpolator()
+                toDoListAnim.duration = 400
+                toDoListAnim.fillAfter = true
+                toDoListAnim.cancel()
+                toDoListAnim.reset()
+                parent.startAnimation(toDoListAnim)
+            }
+        } else {
+            parent.visibility = View.GONE
+        }
     }
 
     private fun hideToDoList (parent: ViewGroup) {

@@ -8,14 +8,14 @@
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#35a4ba"/>
+        android:background="#007EC8"/>
 
     <RelativeLayout
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/statusBar"
-        android:background="#35a4ba">
+        android:background="#007EC8">
 
         <ImageView
             android:id="@+id/pageBack"
@@ -37,6 +37,16 @@
             android:textColor="#f7f7f7"
             android:layout_centerInParent="true"
             android:text="龙虎榜"/>
+
+        <LinearLayout
+            android:id="@+id/titleBtnWrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout

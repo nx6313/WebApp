@@ -163,80 +163,8 @@
                         android:layout_marginRight="4dp"
                         android:background="@drawable/inform_bg"
                         android:padding="6dp"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="16dp"
-                            android:paddingBottom="16dp"
-                            android:paddingLeft="10dp"
-                            android:paddingRight="10dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginRight="6dp"
-                                android:src="@drawable/icon_crm"/>
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_gravity="center_vertical"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:text="CRM通知"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="14sp"
-                                android:textColor="#9c9c9c"
-                                android:text="18/02/23"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="0.4dp"
-                            android:layout_marginLeft="6dp"
-                            android:layout_marginRight="6dp"
-                            android:background="#43ededed"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="16dp"
-                            android:paddingBottom="16dp"
-                            android:paddingLeft="10dp"
-                            android:paddingRight="10dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginRight="6dp"
-                                android:src="@drawable/icon_todo"/>
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_gravity="center_vertical"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:text="待处理的审批流程"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="14sp"
-                                android:textColor="#9c9c9c"
-                                android:text="18/02/23"/>
-                        </LinearLayout>
+                        android:orientation="vertical"
+                        android:visibility="gone">
                     </LinearLayout>
 
                     <LinearLayout

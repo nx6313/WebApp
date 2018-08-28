@@ -38,7 +38,7 @@ class MeFragment : BaseFragment(true) {
 
     override fun getCropImage(bitmap: Bitmap?, cropUri: Uri?, cropFile: File?) {
         val userData: UserData? = UserDataUtil.getUserData(this.context!!)
-        OkGo.post<String>(Urls.URL_BEFORE + Urls.URL_FILE_UPLOAD + userData!!.user!!.id)
+        OkGo.post<String>(Urls.URL_BEFORE + Urls.URL_FILE_UPLOAD)
                 .tag(this)
                 .params("file", cropFile)
                 .execute(object: StringCallback() {
@@ -46,7 +46,7 @@ class MeFragment : BaseFragment(true) {
                         val data = JSONObject(response!!.body())
                         if (data.has("success") && data.getString("success") == "1") {
                             ComFun.showToast(this@MeFragment.context!!, "头像上传成功", Toast.LENGTH_SHORT)
-                            userData.user!!.photo = data.getString("fid")
+                            userData!!.user!!.photo = data.getString("fid")
                             UserDataUtil.setUserData(this@MeFragment.context!!, userData)
                             mAgentWeb!!.jsAccessEntrace.quickCallJs("androidEvent", "userHeadUploadSuccess", Gson().toJson(mapOf(
                                     "fid" to data.getInt("fid")
